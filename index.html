@@ -282,7 +282,6 @@
   .modal-copy-note { font-size: 11px; color: var(--xc-cyan); font-weight: 700; margin-top: 10px; height: 14px; }
 
   /* ---- Live view ---- */
-  @keyframes livePulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,212,232,0.5); } 50% { opacity: 0.5; box-shadow: 0 0 0 6px rgba(0,212,232,0); } }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @keyframes dashFill { from { stroke-dashoffset: var(--dash-start); } to { stroke-dashoffset: var(--dash-end); } }
   @keyframes scanline { 0% { background-position: 0 0; } 100% { background-position: 0 40px; } }
@@ -298,15 +297,19 @@
   .live-inner { max-width: 1180px; margin: 0 auto; }
 
   .live-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 30px; }
+  .live-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
   .live-badge {
     display: inline-flex; align-items: center; gap: 8px; font-size: 9px; font-weight: 800; letter-spacing: 3px;
-    text-transform: uppercase; color: #00D4E8; background: rgba(0,212,232,0.1); border: 1px solid rgba(0,212,232,0.3);
-    padding: 7px 14px; border-radius: 100px; margin-bottom: 16px;
+    text-transform: uppercase; border: 1px solid; padding: 7px 14px; border-radius: 100px;
   }
-  .live-dot { width: 7px; height: 7px; border-radius: 100px; background: #00D4E8; animation: livePulse 1.6s infinite; }
-  .live-h1 { font-size: 30px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.5px; color: #fff; }
+  .live-badge-live { color: #F03C3C; background: rgba(240,60,60,0.1); border-color: rgba(240,60,60,0.3); }
+  .live-badge-ready { color: #4ADE80; background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); }
+  .live-badge-online { color: #00D4E8; background: rgba(0,212,232,0.1); border-color: rgba(0,212,232,0.3); }
+  .live-dot { width: 7px; height: 7px; border-radius: 100px; background: currentColor; }
+  .live-dot-blink { animation: liveDotBlink 1.2s infinite; }
+  @keyframes liveDotBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+  .live-h1 { font-size: 30px; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: #fff; }
   @media (max-width: 600px) { .live-h1 { font-size: 24px; } }
-  .live-sub { font-size: 12.5px; color: #90A0C0; max-width: 520px; line-height: 1.6; }
   .live-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .live-btn {
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; padding: 10px 16px;
@@ -319,9 +322,14 @@
     background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.09); border-radius: 12px;
     animation: fadeInUp 0.5s ease both;
   }
+  .live-section-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #6E7C99;
+    margin: 0 0 10px 2px;
+  }
   .live-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 14px; }
-  @media (max-width: 900px) { .live-stat-grid { grid-template-columns: repeat(2,1fr); } }
-  @media (max-width: 420px) { .live-stat-grid { grid-template-columns: 1fr; } }
+  .live-stat-grid-5 { grid-template-columns: repeat(5,1fr); }
+  @media (max-width: 900px) { .live-stat-grid, .live-stat-grid-5 { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 420px) { .live-stat-grid, .live-stat-grid-5 { grid-template-columns: 1fr; } }
   .live-stat-tile { padding: 20px 22px; }
   .live-stat-label { font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #6E7C99; margin-bottom: 12px; }
   .live-stat-value { font-size: 34px; font-weight: 800; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -342,10 +350,11 @@
   .live-legend-label { color: #B7C1D9; flex: 1; }
   .live-legend-value { font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
 
-  .live-trend { display: flex; align-items: flex-end; gap: 6px; height: 140px; }
-  .live-trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
-  .live-trend-fill { width: 100%; border-radius: 4px 4px 0 0; min-height: 3px; background: linear-gradient(180deg, #00D4E8, #1B52CE); transition: height 1s cubic-bezier(.2,.8,.2,1); }
-  .live-trend-label { font-size: 8.5px; color: #566280; }
+  .ai-spin {
+    display: inline-block; width: 11px; height: 11px; border-radius: 100%; margin-left: 7px; vertical-align: middle;
+    border: 2px solid rgba(0,212,232,0.25); border-top-color: #00D4E8; animation: aiSpin 0.8s linear infinite;
+  }
+  @keyframes aiSpin { to { transform: rotate(360deg); } }
 
   .live-cat-row + .live-cat-row { margin-top: 14px; }
   .live-cat-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #D3DAEC; }
@@ -720,7 +729,18 @@ function liveStatsForKode(kode) {
   var risk = Math.min(100, Math.round(critical * 18 + high * 9 + medium * 3 + low * 1 + rng() * 6));
   var status = LIVE_STATUSES[Math.floor(rng() * LIVE_STATUSES.length)];
   var targets = 1 + Math.floor(rng() * 3);
-  return { critical: critical, high: high, medium: medium, low: low, total: total, risk: risk, status: status, targets: targets };
+  var durationHours = 4 + Math.round(rng() * 68);
+  return { critical: critical, high: high, medium: medium, low: low, total: total, risk: risk, status: status, targets: targets, durationHours: durationHours };
+}
+
+function fmtDuration(hours) {
+  if (!hours) return "&mdash;";
+  if (hours < 24) return Math.round(hours) + " jam";
+  return (hours / 24).toFixed(1) + " hari";
+}
+
+function isLiveActive(status) {
+  return status === "scanning" || status === "analyzing";
 }
 
 function countUp(el, target, duration) {
@@ -759,6 +779,13 @@ function renderLive() {
   var totalLow = perCompany.reduce(function (a, c) { return a + c.stats.low; }, 0);
   var avgRisk = totalEngagements ? Math.round(perCompany.reduce(function (a, c) { return a + c.stats.risk; }, 0) / totalEngagements) : 0;
 
+  var completed = perCompany.filter(function (c) { return c.stats.status === "ready"; });
+  var completedCount = completed.length;
+  var waitingCount = totalEngagements - completedCount;
+  var avgCompletionHours = completed.length
+    ? completed.reduce(function (a, c) { return a + c.stats.durationHours; }, 0) / completed.length
+    : 0;
+
   var sevData = [
     { key: "critical", count: totalCritical },
     { key: "high", count: totalHigh },
@@ -776,17 +803,6 @@ function renderLive() {
     ? "conic-gradient(" + conicParts.join(", ") + ")"
     : "conic-gradient(#1F2A47 0% 100%)";
 
-  var trendSeed = seededRandom("trend-" + totalFindings + "-" + totalEngagements);
-  var trendBuckets = [];
-  var day = 86400000, today = new Date(); today.setHours(0, 0, 0, 0);
-  var base = Math.max(1, Math.round(totalFindings / 10));
-  for (var i = 13; i >= 0; i--) {
-    var d2 = new Date(today.getTime() - i * day);
-    var v = Math.max(0, Math.round(base * (0.4 + trendSeed() * 1.3) + (i === 0 ? base * 0.6 : 0)));
-    trendBuckets.push({ count: v, label: d2.getDate() + "/" + (d2.getMonth() + 1), last: i === 0 });
-  }
-  var trendMax = Math.max.apply(null, trendBuckets.map(function (b) { return b.count; }).concat([1]));
-
   var catSeed = seededRandom("categories-" + totalFindings);
   var catData = LIVE_CATEGORIES.map(function (name) {
     return { name: name, count: Math.round(2 + catSeed() * (6 + totalFindings)) };
@@ -797,23 +813,39 @@ function renderLive() {
   html += '<div class="live-wrap"><div class="live-inner">';
 
   html += '<div class="live-header">';
-  html += '<div><div class="live-badge"><span class="live-dot"></span>LIVE</div>';
+  html += '<div>';
+  html += '<div class="live-badges">';
+  html += '<span class="live-badge live-badge-live"><span class="live-dot live-dot-blink"></span>LIVE</span>';
+  html += '<span class="live-badge live-badge-ready"><span class="live-dot"></span>AI Ready</span>';
+  html += '<span class="live-badge live-badge-online"><span class="live-dot"></span>Online</span>';
+  html += '</div>';
   html += '<h1 class="live-h1">Xecura Pentest AI &middot; Powered by RED ORYX</h1>';
-  html += '<p class="live-sub">Ringkasan live lintas engagement dan target aktif, digabungkan dari seluruh pendaftar Cybersecurity Clinic.</p></div>';
+  html += '</div>';
   html += '<div class="live-actions">';
   html += '<button class="live-btn" id="live-refresh-btn" onclick="refreshLive()" ' + (state.liveLoading ? "disabled" : "") + '>' + (state.liveLoading ? "Memperbarui…" : "&#8635; Perbarui Data") + '</button>';
   html += '<button class="live-logout" onclick="liveLogout()">Kunci Live</button>';
   html += '</div></div>';
 
-  html += '<div class="live-stat-grid">';
+  html += '<div class="live-section-label">Status Engagement</div>';
+  html += '<div class="live-stat-grid live-stat-grid-5">';
   html += '<div class="live-panel live-stat-tile" style="animation-delay:.02s;"><div class="live-stat-label">Total Engagement</div><div class="live-stat-value" id="cu-eng">0</div><div class="live-stat-sub">' + totalTargets + ' target dipindai</div></div>';
-  html += '<div class="live-panel live-stat-tile" style="animation-delay:.08s;"><div class="live-stat-label">Total Findings</div><div class="live-stat-value accent" id="cu-find">0</div><div class="live-stat-sub">Seluruh severity</div></div>';
-  html += '<div class="live-panel live-stat-tile" style="animation-delay:.14s;"><div class="live-stat-label">Critical Findings</div><div class="live-stat-value" id="cu-crit" style="color:' + SEV_COLORS.critical + ';">0</div><div class="live-stat-sub">Perlu remediasi segera</div></div>';
-  html += '<div class="live-panel live-stat-tile" style="animation-delay:.2s;"><div class="live-stat-label">Avg Risk Score</div><div class="live-stat-value" id="cu-risk">0</div><div class="live-stat-sub">Skala 0&ndash;100</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.06s;"><div class="live-stat-label">Selesai</div><div class="live-stat-value" id="cu-done" style="color:#4ADE80;">0</div><div class="live-stat-sub">Report ready</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.1s;"><div class="live-stat-label">Menunggu Antrian</div><div class="live-stat-value" id="cu-wait" style="color:#F5B93B;">0</div><div class="live-stat-sub">Belum selesai</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.14s;"><div class="live-stat-label">Rata-rata Waktu Selesai</div><div class="live-stat-value" style="font-size:26px;">' + fmtDuration(avgCompletionHours) + '</div><div class="live-stat-sub">Dari engagement selesai</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.18s;"><div class="live-stat-label">Avg Risk Score</div><div class="live-stat-value" id="cu-risk">0</div><div class="live-stat-sub">Skala 0&ndash;100</div></div>';
+  html += '</div>';
+
+  html += '<div class="live-section-label">Distribusi Findings</div>';
+  html += '<div class="live-stat-grid live-stat-grid-5">';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.22s;"><div class="live-stat-label">Total Findings</div><div class="live-stat-value accent" id="cu-find">0</div><div class="live-stat-sub">Seluruh severity</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.26s;"><div class="live-stat-label">Critical</div><div class="live-stat-value" id="cu-crit" style="color:' + SEV_COLORS.critical + ';">0</div><div class="live-stat-sub">Perlu remediasi segera</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.3s;"><div class="live-stat-label">High</div><div class="live-stat-value" id="cu-high" style="color:' + SEV_COLORS.high + ';">0</div><div class="live-stat-sub">Prioritas tinggi</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.34s;"><div class="live-stat-label">Medium</div><div class="live-stat-value" id="cu-med" style="color:' + SEV_COLORS.medium + ';">0</div><div class="live-stat-sub">Perlu ditinjau</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.38s;"><div class="live-stat-label">Low</div><div class="live-stat-value" id="cu-low" style="color:' + SEV_COLORS.low + ';">0</div><div class="live-stat-sub">Prioritas rendah</div></div>';
   html += '</div>';
 
   html += '<div class="live-grid-a">';
-  html += '<div class="live-panel live-panel-pad" style="animation-delay:.26s;">';
+  html += '<div class="live-panel live-panel-pad" style="animation-delay:.42s;">';
   html += '<div class="live-panel-title">Findings by Severity</div><div class="live-panel-sub">Distribusi seluruh temuan</div>';
   html += '<div class="live-donut-wrap">';
   html += '<div style="width:130px;height:130px;border-radius:100%;background:' + conicGradient + ';flex:none;display:flex;align-items:center;justify-content:center;">';
@@ -827,36 +859,27 @@ function renderLive() {
   });
   html += '</div></div></div>';
 
-  html += '<div class="live-panel live-panel-pad" style="animation-delay:.32s;">';
-  html += '<div class="live-panel-title">Findings Discovered</div><div class="live-panel-sub">14 hari terakhir, seluruh engagement</div>';
-  html += '<div class="live-trend">';
-  trendBuckets.forEach(function (b) {
-    html += '<div class="live-trend-col"><div style="font-size:9.5px;font-weight:700;color:' + (b.last ? "#00D4E8" : "#B7C1D9") + ';">' + b.count + '</div><div class="live-trend-fill" data-h="' + Math.max(3, Math.round(b.count / trendMax * 100)) + '" style="height:0;' + (b.last ? "background:linear-gradient(180deg,#00D4E8,#F03C3C);" : "") + '"></div><div class="live-trend-label">' + b.label + '</div></div>';
-  });
-  html += '</div></div>';
-  html += '</div>';
-
-  html += '<div class="live-panel live-panel-pad" style="margin-bottom:14px;animation-delay:.38s;">';
+  html += '<div class="live-panel live-panel-pad" style="animation-delay:.46s;">';
   html += '<div class="live-panel-title">Top Kategori Kerentanan</div><div class="live-panel-sub">Digabungkan lintas seluruh target</div>';
   catData.forEach(function (c) {
     var w = Math.round(c.count / catMax * 100);
     html += '<div class="live-cat-row"><div class="live-cat-head"><span>' + esc(c.name) + '</span><span style="color:#6E7C99;">' + c.count + '</span></div><div class="live-cat-track"><div class="live-cat-fill" data-w="' + w + '"></div></div></div>';
   });
   html += '</div>';
+  html += '</div>';
 
-  html += '<div class="live-panel" style="animation-delay:.44s;">';
-  html += '<div class="live-panel-pad" style="padding-bottom:10px;"><div class="live-panel-title">Engagement per Perusahaan</div><div class="live-panel-sub" style="margin-bottom:0;">Merujuk kode registrasi Cybersecurity Clinic</div></div>';
+  html += '<div class="live-panel" style="animation-delay:.5s;">';
+  html += '<div class="live-panel-pad" style="padding-bottom:10px;"><div class="live-panel-title">Engagement Aktif</div><div class="live-panel-sub" style="margin-bottom:0;">Berdasarkan kode registrasi Cybersecurity Clinic</div></div>';
   if (!perCompany.length) {
     html += '<div class="empty-note" style="color:#6E7C99;padding:0 24px 24px;">Belum ada engagement aktif.</div>';
   } else {
-    html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Perusahaan</th><th>Status</th><th>Findings</th><th>Risk</th></tr></thead><tbody>';
+    html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Status</th><th>Findings</th><th>Risk</th></tr></thead><tbody>';
     perCompany.slice().sort(function (a, b) { return b.stats.risk - a.stats.risk; }).forEach(function (c) {
       var s = c.stats;
       var riskColor = s.risk >= 60 ? SEV_COLORS.critical : s.risk >= 35 ? SEV_COLORS.high : "#4ADE80";
       html += '<tr>';
       html += '<td class="ltcode">' + esc(c.row.kode || "&mdash;") + '</td>';
-      html += '<td class="ltcompany">' + esc(c.row.perusahaan) + '</td>';
-      html += '<td><span class="live-status-pill live-status-' + s.status + '">' + LIVE_STATUS_LABELS[s.status] + '</span></td>';
+      html += '<td><span class="live-status-pill live-status-' + s.status + '">' + LIVE_STATUS_LABELS[s.status] + '</span>' + (isLiveActive(s.status) ? '<span class="ai-spin"></span>' : '') + '</td>';
       html += '<td><div class="live-mini-bar">';
       ["critical", "high", "medium", "low"].forEach(function (k) {
         var segPct = s.total ? (s[k] / s.total * 100) : 0;
@@ -874,14 +897,16 @@ function renderLive() {
   el.innerHTML = html;
 
   countUp(document.getElementById("cu-eng"), totalEngagements, 900);
+  countUp(document.getElementById("cu-done"), completedCount, 900);
+  countUp(document.getElementById("cu-wait"), waitingCount, 900);
   countUp(document.getElementById("cu-find"), totalFindings, 900);
   countUp(document.getElementById("cu-crit"), totalCritical, 900);
+  countUp(document.getElementById("cu-high"), totalHigh, 900);
+  countUp(document.getElementById("cu-med"), totalMedium, 900);
+  countUp(document.getElementById("cu-low"), totalLow, 900);
   countUp(document.getElementById("cu-risk"), avgRisk, 900);
 
   setTimeout(function () {
-    document.querySelectorAll(".live-trend-fill").forEach(function (elx) {
-      elx.style.height = elx.getAttribute("data-h") + "%";
-    });
     document.querySelectorAll(".live-cat-fill").forEach(function (elx) {
       elx.style.width = elx.getAttribute("data-w") + "%";
     });
