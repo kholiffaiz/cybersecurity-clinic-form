@@ -53,15 +53,22 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 74px;
-    gap: 24px;
+    min-height: 74px;
+    gap: 14px;
     flex-wrap: wrap;
+    padding: 12px 0;
   }
   .brand { display: flex; align-items: center; gap: 18px; }
   .brand img { height: 26px; display: block; }
   .brand-divider { width: 1px; height: 26px; background: rgba(255,255,255,0.22); }
   .brand-label {
     font-size: 10px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase; color: var(--xc-cyan);
+  }
+  @media (max-width: 480px) {
+    .header { padding: 0 16px; }
+    .brand { gap: 10px; }
+    .brand-divider { display: none; }
+    .brand-label { display: none; }
   }
   .tabs {
     display: flex; gap: 6px; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 100px;
@@ -74,16 +81,22 @@
   .gradient-bar { height: 4px; background: var(--xc-gradient); }
 
   .page { max-width: 1180px; margin: 0 auto; padding: 44px 24px 64px; }
+  @media (max-width: 600px) { .page { padding: 24px 16px 40px; } }
 
   /* ---- Form view ---- */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
-  @media (max-width: 860px) { .form-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 860px) {
+    .form-grid { grid-template-columns: 1fr; gap: 32px; }
+    .form-grid > *:first-child { order: 2; }
+    .form-grid > *:last-child { order: 1; }
+  }
 
   .eyebrow {
     display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase;
     color: var(--xc-blue); background: var(--xc-blue-light); padding: 7px 14px; border-radius: 100px;
   }
   .h1 { font-size: 40px; font-weight: 800; line-height: 1.18; margin: 20px 0 16px; letter-spacing: -0.8px; }
+  @media (max-width: 600px) { .h1 { font-size: 27px; } }
   .lead { font-size: 14px; line-height: 1.72; color: var(--xc-text-body); margin: 0 0 30px; max-width: 460px; }
 
   .steps { display: flex; flex-direction: column; gap: 14px; max-width: 440px; }
@@ -103,6 +116,7 @@
     box-shadow: 0 4px 28px rgba(11,45,126,0.12); overflow: hidden;
   }
   .card-body { padding: 34px 36px 36px; }
+  @media (max-width: 600px) { .card-body { padding: 24px 20px 26px; } }
 
   .field { margin-bottom: 18px; }
   .field label {
@@ -159,6 +173,7 @@
 
   .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 16px; }
   @media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 420px) { .stat-grid { grid-template-columns: 1fr; } }
   .stat-tile { border-radius: 10px; padding: 22px 24px; }
   .stat-tile.primary { background: var(--xc-navy); color: #fff; box-shadow: 0 2px 12px rgba(11,45,126,0.14); }
   .stat-tile.secondary { background: #fff; border: 1px solid var(--xc-border); box-shadow: 0 2px 12px rgba(11,45,126,0.08); }
@@ -177,10 +192,12 @@
 
   .panel { background: #fff; border: 1px solid var(--xc-border); border-radius: 10px; box-shadow: 0 2px 12px rgba(11,45,126,0.08); }
   .panel-pad { padding: 24px 26px 20px; }
+  @media (max-width: 600px) { .panel-pad { padding: 18px 18px 16px; } }
   .panel-title { font-size: 14px; font-weight: 800; margin-bottom: 3px; }
   .panel-sub { font-size: 11.5px; color: var(--xc-text-muted); margin-bottom: 24px; }
 
-  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 170px; }
+  .bar-chart-scroll { overflow-x: auto; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 170px; min-width: 480px; }
   .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
   .bar-count { font-size: 10.5px; font-weight: 700; color: var(--xc-text); }
   .bar-fill { width: 100%; border-radius: 6px 6px 0 0; min-height: 3px; }
@@ -200,7 +217,8 @@
   .company-name { flex: 1; font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .company-count { font-size: 12.5px; font-weight: 800; color: var(--xc-blue); }
 
-  table.registrants { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .table-scroll { overflow-x: auto; }
+  table.registrants { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 12px; }
   table.registrants thead tr { background: var(--xc-navy); color: #fff; text-align: left; }
   table.registrants th { padding: 11px 26px; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; }
   table.registrants th:not(:first-child), table.registrants td:not(:first-child) { padding-left: 14px; padding-right: 14px; }
@@ -212,6 +230,19 @@
 
   .empty-note { font-size: 12.5px; color: var(--xc-text-muted); padding: 20px 0; text-align: center; }
 
+  .gate-wrap { max-width: 380px; margin: 40px auto; text-align: center; }
+  .gate-icon {
+    width: 52px; height: 52px; margin: 0 auto 20px; border-radius: 100px; background: var(--xc-blue-light);
+    color: var(--xc-blue); font-size: 22px; display: flex; align-items: center; justify-content: center;
+  }
+  .gate-title { font-size: 19px; font-weight: 800; margin-bottom: 6px; }
+  .gate-desc { font-size: 12.5px; color: var(--xc-text-muted); line-height: 1.6; margin-bottom: 24px; }
+  .gate-field { text-align: left; margin-bottom: 8px; }
+  .dash-logout {
+    background: none; border: none; color: var(--xc-text-muted); font-size: 11.5px; font-weight: 700;
+    cursor: pointer; text-decoration: underline; padding: 0;
+  }
+
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(11,45,126,0.55); display: flex; align-items: center;
     justify-content: center; padding: 20px; z-index: 100;
@@ -221,6 +252,7 @@
     box-shadow: 0 20px 60px rgba(11,45,126,0.35); text-align: center;
   }
   .modal-body { padding: 40px 32px 32px; }
+  @media (max-width: 480px) { .modal-body { padding: 30px 20px 24px; } .modal-code { font-size: 24px; } }
   .modal-eyebrow {
     font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--xc-text-muted);
     margin-bottom: 14px;
@@ -292,7 +324,7 @@
 <div class="footer">
   <div class="footer-inner">
     <div>Xecura — PT Gan Mitra Usaha · Cybersecurity Clinic 2026</div>
-    <div id="footer-note">Memuat data…</div>
+    <div id="footer-note">Tersambung ke Google Spreadsheet</div>
   </div>
 </div>
 
@@ -308,9 +340,15 @@ var state = {
   view: "form",
   nama: "", perusahaan: "", email: "", domain: "",
   error: "", sending: false, submitted: false, syncOk: false,
-  rows: [], loading: true, loadError: false,
-  kode: "", showModal: false
+  rows: [], loading: false, loadError: false,
+  kode: "", showModal: false,
+  dashAuthed: false, dashPassword: "", dashPwError: "", dashChecking: false
 };
+
+try {
+  var savedPw = sessionStorage.getItem("xc_dash_pw");
+  if (savedPw) { state.dashAuthed = true; state.dashPassword = savedPw; }
+} catch (e) {}
 
 function genKode() {
   var n = Math.floor(Math.random() * 1000000);
@@ -329,7 +367,77 @@ function showView(v) {
   document.getElementById("tab-dash").className = "tab-btn" + (v === "dash" ? " active" : "");
   document.getElementById("view-form").style.display = v === "form" ? "block" : "none";
   document.getElementById("view-dash").style.display = v === "dash" ? "block" : "none";
-  if (v === "dash") { loadRows(); renderDash(); }
+  if (v === "dash") {
+    if (state.dashAuthed) { loadRows(); renderDash(); }
+    else { renderDashGate(); }
+  }
+}
+
+function dashLogout() {
+  state.dashAuthed = false;
+  state.dashPassword = "";
+  state.rows = [];
+  try { sessionStorage.removeItem("xc_dash_pw"); } catch (e) {}
+  renderDashGate();
+}
+
+function submitDashPw() {
+  var input = document.getElementById("gate-pw");
+  var pw = (input ? input.value : "").trim();
+  if (!pw) {
+    state.dashPwError = "Masukkan password terlebih dahulu.";
+    renderDashGate();
+    return;
+  }
+  state.dashChecking = true;
+  state.dashPwError = "";
+  renderDashGate();
+
+  fetch(API_URL + "?pw=" + encodeURIComponent(pw), { method: "GET", credentials: "omit" })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      state.dashChecking = false;
+      if (data && data.ok) {
+        state.dashAuthed = true;
+        state.dashPassword = pw;
+        state.rows = data.rows || [];
+        state.loading = false;
+        state.loadError = false;
+        try { sessionStorage.setItem("xc_dash_pw", pw); } catch (e) {}
+        updateFooter();
+        renderDash();
+      } else {
+        state.dashPwError = "Password salah. Coba lagi.";
+        renderDashGate();
+      }
+    })
+    .catch(function () {
+      state.dashChecking = false;
+      state.dashPwError = "Gagal menghubungi server. Coba lagi.";
+      renderDashGate();
+    });
+}
+
+function renderDashGate() {
+  var el = document.getElementById("view-dash");
+  el.innerHTML =
+    '<div class="gate-wrap">' +
+      '<div class="card">' +
+        '<div class="gradient-bar"></div>' +
+        '<div class="card-body">' +
+          '<div class="gate-icon">&#128274;</div>' +
+          '<div class="gate-title">Dashboard Terproteksi</div>' +
+          '<p class="gate-desc">Masukkan password untuk melihat statistik pendaftaran Cybersecurity Clinic.</p>' +
+          '<div class="gate-field field"><label for="gate-pw">Password</label><input id="gate-pw" type="password" placeholder="Masukkan password"></div>' +
+          (state.dashPwError ? '<div class="error-box">' + esc(state.dashPwError) + '</div>' : '') +
+          '<button class="submit-btn" id="gate-submit" ' + (state.dashChecking ? "disabled" : "") + '>' + (state.dashChecking ? "Memeriksa…" : "Buka Dashboard") + '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  var pwInput = document.getElementById("gate-pw");
+  pwInput.addEventListener("keydown", function (e) { if (e.key === "Enter") submitDashPw(); });
+  pwInput.focus();
+  document.getElementById("gate-submit").addEventListener("click", submitDashPw);
 }
 
 function set(key) {
@@ -480,15 +588,17 @@ function renderForm() {
 }
 
 function loadRows(retriesLeft) {
+  if (!state.dashAuthed || !state.dashPassword) return;
   if (retriesLeft === undefined) retriesLeft = 2;
   state.loading = true;
-  fetch(API_URL, { method: "GET", credentials: "omit" })
+  fetch(API_URL + "?pw=" + encodeURIComponent(state.dashPassword), { method: "GET", credentials: "omit" })
     .then(function (r) {
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
     })
     .then(function (data) {
-      state.rows = (data && data.rows) || [];
+      if (!data || !data.ok) throw new Error("unauthorized");
+      state.rows = data.rows || [];
       state.loading = false;
       state.loadError = false;
       updateFooter();
@@ -507,6 +617,7 @@ function loadRows(retriesLeft) {
 }
 
 function updateFooter() {
+  if (!state.dashAuthed) return;
   var el = document.getElementById("footer-note");
   if (state.loadError) el.textContent = "Gagal memuat data spreadsheet.";
   else el.textContent = state.rows.length + " pendaftar tercatat · Tersambung ke Google Spreadsheet";
@@ -566,7 +677,10 @@ function renderDash() {
   var html = '';
   html += '<div class="dash-header">';
   html +=   '<div><div class="dash-eyebrow">Statistik Pendaftaran</div><h1 class="dash-h1">Dashboard Cybersecurity Clinic</h1></div>';
-  html +=   '<a class="sheet-link" href="' + SHEET_URL + '" target="_blank" rel="noopener">Buka Google Spreadsheet &rarr;</a>';
+  html +=   '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">';
+  html +=     '<a class="sheet-link" href="' + SHEET_URL + '" target="_blank" rel="noopener">Buka Google Spreadsheet &rarr;</a>';
+  html +=     '<button class="dash-logout" onclick="dashLogout()">Kunci dashboard</button>';
+  html +=   '</div>';
   html += '</div>';
 
   html += '<div class="stat-grid">';
@@ -579,12 +693,12 @@ function renderDash() {
   html += '<div class="panel-grid-a">';
   html +=   '<div class="panel panel-pad">';
   html +=     '<div class="panel-title">Pendaftaran per Hari</div><div class="panel-sub">14 hari terakhir</div>';
-  html +=     '<div class="bar-chart">';
+  html +=     '<div class="bar-chart-scroll"><div class="bar-chart">';
   buckets.forEach(function (b) {
     var h = Math.max(3, Math.round(b.count / maxC * 118));
     html += '<div class="bar-col"><div class="bar-count">' + b.count + '</div><div class="bar-fill" style="height:' + h + 'px;background:' + (b.last ? "var(--xc-cyan)" : "var(--xc-blue)") + ';"></div><div class="bar-label">' + b.label + '</div></div>';
   });
-  html +=     '</div>';
+  html +=     '</div></div>';
   html +=   '</div>';
   html +=   '<div class="panel panel-pad">';
   html +=     '<div class="panel-title">Sebaran Ekstensi Domain</div><div class="panel-sub">Berdasarkan domain yang didaftarkan</div>';
@@ -616,11 +730,11 @@ function renderDash() {
   if (!latest.length) {
     html += '<div class="empty-note">Belum ada pendaftar.</div>';
   } else {
-    html += '<table class="registrants"><thead><tr><th>Nama</th><th>Perusahaan</th><th>Domain</th><th>Tanggal</th></tr></thead><tbody>';
+    html += '<div class="table-scroll"><table class="registrants"><thead><tr><th>Nama</th><th>Perusahaan</th><th>Domain</th><th>Tanggal</th></tr></thead><tbody>';
     latest.forEach(function (r) {
       html += '<tr><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td class="tdate">' + fmtDate(r.ts) + '</td></tr>';
     });
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
   }
   html +=   '</div>';
   html += '</div>';
@@ -630,7 +744,6 @@ function renderDash() {
 
 renderForm();
 showView("form");
-loadRows();
 </script>
 </body>
 </html>
