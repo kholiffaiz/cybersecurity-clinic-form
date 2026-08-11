@@ -624,7 +624,7 @@ function renderForm() {
       '</div>' +
       (state.error ? '<div class="error-box" id="form-error-box">' + esc(state.error) + '</div>' : '') +
       '<button class="submit-btn" id="btn-submit" ' + (state.sending ? "disabled" : "") + '>' + (state.sending ? "Mengirim…" : "Kirim Pendaftaran") + '</button>' +
-      '<div class="form-footnote">Data disimpan ke Google Spreadsheet pendaftaran Xecura dan hanya digunakan untuk keperluan penyelenggaraan Cybersecurity Clinic.</div>' +
+      '<div class="form-footnote">Data hanya digunakan untuk keperluan penyelenggaraan Cybersecurity Clinic.</div>' +
     '</div>';
 
   document.getElementById("f-nama").addEventListener("input", set("nama"));
