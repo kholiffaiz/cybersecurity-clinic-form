@@ -119,7 +119,7 @@
   @media (max-width: 600px) { .card-body { padding: 24px 20px 26px; } }
 
   .card-partner {
-    display: flex; align-items: center; gap: 10px; padding: 14px 36px;
+    display: flex; align-items: center; gap: 14px; padding: 14px 36px; flex-wrap: wrap;
     border-bottom: 1px solid var(--xc-border); background: var(--xc-bg-light);
   }
   @media (max-width: 600px) { .card-partner { padding: 12px 20px; } }
@@ -127,6 +127,7 @@
     font-size: 9px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--xc-text-muted);
   }
   .card-partner img { height: 20px; display: block; }
+  .card-partner-square { height: 28px !important; }
 
   .field { margin-bottom: 18px; }
   .field label {
@@ -231,6 +232,7 @@
 
   .table-scroll { overflow-x: auto; }
   table.registrants { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 12px; }
+  table.registrants.registrants-full { min-width: 760px; }
   table.registrants thead tr { background: var(--xc-navy); color: #fff; text-align: left; }
   table.registrants th { padding: 11px 26px; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; }
   table.registrants th:not(:first-child), table.registrants td:not(:first-child) { padding-left: 14px; padding-right: 14px; }
@@ -444,7 +446,9 @@
       <div class="gradient-bar"></div>
       <div class="card-partner">
         <span class="card-partner-label">Didukung oleh</span>
+        <img src="assets/logo-deltamas.png" alt="Deltamas" class="card-partner-square">
         <img src="assets/logo-onesmartservices.png" alt="OneSmartServices">
+        <img src="assets/logo-xecura-horizontal.png" alt="Xecura">
       </div>
       <div class="card-body" id="card-body"></div>
     </div>
@@ -457,7 +461,7 @@
 <div class="footer">
   <div class="footer-inner">
     <div>OneSmartService</div>
-    <div id="footer-note"></div>
+    <div id="footer-note">Deltamas Cybersecurity Awareness 2026</div>
   </div>
 </div>
 
@@ -484,7 +488,7 @@ var state = {
   error: "", sending: false, submitted: false, syncOk: false,
   rows: [], loading: false, loadError: false,
   kode: "", showModal: false,
-  dashAuthed: false, dashPassword: "", dashPwError: "", dashChecking: false,
+  dashAuthed: false, dashPassword: "", dashPwError: "", dashChecking: false, dashShowAll: false,
   liveAuthed: false, livePassword: "", liveRows: [], liveLoading: false, liveLoadError: false,
   livePwError: "", liveChecking: false
 };
@@ -901,6 +905,18 @@ function fmtDate(ts) {
   return d.getDate() + " " + b[d.getMonth()] + " " + d.getFullYear();
 }
 
+function fmtDateTime(ts) {
+  var d = new Date(ts);
+  var hh = String(d.getHours()).padStart(2, "0");
+  var mm = String(d.getMinutes()).padStart(2, "0");
+  return fmtDate(ts) + ", " + hh + ":" + mm;
+}
+
+function toggleDashShowAll() {
+  state.dashShowAll = !state.dashShowAll;
+  renderDash();
+}
+
 function submit() {
   var nama = (state.nama || "").trim();
   var perusahaan = (state.perusahaan || "").trim();
@@ -1157,13 +1173,14 @@ function renderDash() {
 
   var last7 = rows.filter(function (r) { return r.ts >= Date.now() - 7 * day; }).length;
   var latest = rows.slice(-6).reverse();
+  var allSorted = rows.slice().reverse();
+  var displayRows = state.dashShowAll ? allSorted : latest;
 
   var html = '';
   html += '<div class="dash-header">';
   html +=   '<div><div class="dash-eyebrow">Statistik Pendaftaran</div><h1 class="dash-h1">Dashboard Cybersecurity Clinic</h1></div>';
   html +=   '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">';
   html +=     '<button class="sheet-link" id="dash-refresh-btn" onclick="refreshDash()" ' + (state.loading ? "disabled" : "") + '>' + (state.loading ? "Memperbarui…" : "&#8635; Perbarui Data") + '</button>';
-  html +=     '<a class="sheet-link" href="' + SHEET_URL + '" target="_blank" rel="noopener">Buka Google Spreadsheet &rarr;</a>';
   html +=     '<button class="dash-logout" onclick="dashLogout()">Kunci dashboard</button>';
   html +=   '</div>';
   html += '</div>';
@@ -1210,13 +1227,22 @@ function renderDash() {
     });
   }
   html +=   '</div>';
-  html +=   '<div class="panel">';
-  html +=     '<div class="panel-pad" style="padding-bottom:18px;"><div class="panel-title">Pendaftar Terbaru</div><div class="panel-sub" style="margin-bottom:0;">Sinkron dengan baris terakhir di spreadsheet</div></div>';
-  if (!latest.length) {
+  html +=   '<div class="panel"' + (state.dashShowAll ? ' style="grid-column:1/-1;"' : '') + '>';
+  html +=     '<div class="panel-pad" style="padding-bottom:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;">';
+  html +=       '<div><div class="panel-title">Pendaftar Terbaru</div><div class="panel-sub" style="margin-bottom:0;">' + (state.dashShowAll ? "Menampilkan seluruh " + rows.length + " pendaftar" : "Sinkron dengan baris terakhir di spreadsheet") + '</div></div>';
+  html +=       '<button class="sheet-link" onclick="toggleDashShowAll()">' + (state.dashShowAll ? "Tampilkan lebih sedikit" : "Tampilkan semua pendaftar") + '</button>';
+  html +=     '</div>';
+  if (!displayRows.length) {
     html += '<div class="empty-note">Belum ada pendaftar.</div>';
+  } else if (state.dashShowAll) {
+    html += '<div class="table-scroll"><table class="registrants registrants-full"><thead><tr><th>Kode</th><th>Nama</th><th>Perusahaan</th><th>Email</th><th>Domain</th><th>Timestamp</th></tr></thead><tbody>';
+    displayRows.forEach(function (r) {
+      html += '<tr><td class="tdomain">' + esc(r.kode || "&mdash;") + '</td><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tcompany">' + esc(r.email) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td class="tdate">' + fmtDateTime(r.ts) + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
   } else {
     html += '<div class="table-scroll"><table class="registrants"><thead><tr><th>Nama</th><th>Perusahaan</th><th>Domain</th><th>Tanggal</th></tr></thead><tbody>';
-    latest.forEach(function (r) {
+    displayRows.forEach(function (r) {
       html += '<tr><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td class="tdate">' + fmtDate(r.ts) + '</td></tr>';
     });
     html += '</tbody></table></div>';
