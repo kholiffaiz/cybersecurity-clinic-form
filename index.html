@@ -268,7 +268,8 @@
     background: var(--xc-blue-light); border: 1px dashed #B9CDF5; border-radius: 10px;
     padding: 16px 12px; margin: 0 0 16px;
   }
-  .modal-desc { font-size: 12.5px; line-height: 1.7; color: var(--xc-text-body); margin: 0 0 26px; }
+  .modal-desc { font-size: 12.5px; line-height: 1.7; color: var(--xc-text-body); margin: 0 0 12px; }
+  .modal-desc:last-of-type { margin-bottom: 26px; }
   .modal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .modal-copy-note { font-size: 11px; color: var(--xc-cyan); font-weight: 700; margin-top: 10px; height: 14px; }
 
@@ -531,6 +532,44 @@ function copyKode() {
   });
 }
 
+function downloadKode() {
+  var code = state.kode;
+  var w = 480, h = 240;
+  var canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  var ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "#EBF2FF";
+  ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = "#B9CDF5";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 5]);
+  ctx.strokeRect(10, 10, w - 20, h - 20);
+  ctx.setLineDash([]);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#6B7280";
+  ctx.font = "bold 12px Arial, sans-serif";
+  ctx.fillText("KODE REGISTRASI CYBERSECURITY CLINIC", w / 2, 50);
+
+  ctx.fillStyle = "#0B2D7E";
+  ctx.font = "bold 42px Arial, sans-serif";
+  ctx.fillText(code, w / 2, 115);
+
+  ctx.fillStyle = "#374151";
+  ctx.font = "12px Arial, sans-serif";
+  ctx.fillText("Simpan kode ini untuk pengambilan hasil", w / 2, 165);
+  ctx.fillText("cybersecurity health check.", w / 2, 183);
+
+  var a = document.createElement("a");
+  a.href = canvas.toDataURL("image/jpeg", 0.85);
+  a.download = "kode-registrasi-" + code + ".jpg";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 function renderModal() {
   state.showModal = true;
   var root = document.getElementById("modal-root");
@@ -542,8 +581,10 @@ function renderModal() {
           '<div class="modal-eyebrow">Kode Registrasi Anda</div>' +
           '<div class="modal-code">' + esc(state.kode) + '</div>' +
           '<p class="modal-desc">Simpan kode ini sebagai bukti pendaftaran Cybersecurity Clinic. Kode juga tercatat pada baris data Anda di Google Spreadsheet.</p>' +
+          '<p class="modal-desc">Simpan kode ini untuk pengambilan hasil cybersecurity health check.</p>' +
           '<div class="modal-actions">' +
             '<button class="btn-primary" onclick="copyKode()">Salin Kode</button>' +
+            '<button class="btn-secondary" onclick="downloadKode()">Download Kode</button>' +
             '<button class="btn-secondary" onclick="closeModal()">Tutup</button>' +
           '</div>' +
           '<div class="modal-copy-note" id="modal-copy-note"></div>' +
