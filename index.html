@@ -64,11 +64,17 @@
   .brand-label {
     font-size: 10px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase; color: var(--xc-cyan);
   }
+  .brand-partner {
+    background: #fff; border-radius: 6px; padding: 5px 10px; display: flex; align-items: center;
+  }
+  .brand-partner img { height: 18px; display: block; }
   @media (max-width: 480px) {
     .header { padding: 0 16px; }
     .brand { gap: 10px; }
     .brand-divider { display: none; }
     .brand-label { display: none; }
+    .brand-partner { padding: 4px 8px; }
+    .brand-partner img { height: 15px; }
   }
   .tabs {
     display: flex; gap: 6px; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 100px;
@@ -280,7 +286,7 @@
     <div class="brand">
       <img src="assets/logo-xecura-horizontal-white.png" alt="Xecura">
       <div class="brand-divider"></div>
-      <div class="brand-label">Cybersecurity Clinic</div>
+      <div class="brand-partner"><img src="assets/logo-onesmartservices.png" alt="OneSmartServices"></div>
     </div>
     <div class="tabs">
       <button class="tab-btn" id="tab-form" onclick="showView('form')">Formulir</button>
@@ -323,8 +329,8 @@
 
 <div class="footer">
   <div class="footer-inner">
-    <div>Xecura — PT Gan Mitra Usaha · Cybersecurity Clinic 2026</div>
-    <div id="footer-note">Tersambung ke Google Spreadsheet</div>
+    <div>OneSmartService</div>
+    <div id="footer-note"></div>
   </div>
 </div>
 
@@ -620,7 +626,7 @@ function updateFooter() {
   if (!state.dashAuthed) return;
   var el = document.getElementById("footer-note");
   if (state.loadError) el.textContent = "Gagal memuat data spreadsheet.";
-  else el.textContent = state.rows.length + " pendaftar tercatat · Tersambung ke Google Spreadsheet";
+  else el.textContent = state.rows.length + " pendaftar tercatat";
 }
 
 function renderDash() {
