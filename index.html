@@ -275,6 +275,122 @@
   .modal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .modal-copy-note { font-size: 11px; color: var(--xc-cyan); font-weight: 700; margin-top: 10px; height: 14px; }
 
+  /* ---- Live view ---- */
+  @keyframes livePulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,212,232,0.5); } 50% { opacity: 0.5; box-shadow: 0 0 0 6px rgba(0,212,232,0); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes dashFill { from { stroke-dashoffset: var(--dash-start); } to { stroke-dashoffset: var(--dash-end); } }
+  @keyframes scanline { 0% { background-position: 0 0; } 100% { background-position: 0 40px; } }
+
+  .live-wrap {
+    background: radial-gradient(ellipse at top, #0F1B3D 0%, #060A17 65%);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,212,232,0.025) 0px, rgba(0,212,232,0.025) 1px, transparent 1px, transparent 40px),
+      radial-gradient(ellipse at top, #0F1B3D 0%, #060A17 65%);
+    min-height: 100vh; color: #E4EAF5; padding: 44px 24px 64px;
+  }
+  @media (max-width: 600px) { .live-wrap { padding: 24px 16px 40px; } }
+  .live-inner { max-width: 1180px; margin: 0 auto; }
+
+  .live-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 30px; }
+  .live-badge {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 9px; font-weight: 800; letter-spacing: 3px;
+    text-transform: uppercase; color: #00D4E8; background: rgba(0,212,232,0.1); border: 1px solid rgba(0,212,232,0.3);
+    padding: 7px 14px; border-radius: 100px; margin-bottom: 16px;
+  }
+  .live-dot { width: 7px; height: 7px; border-radius: 100px; background: #00D4E8; animation: livePulse 1.6s infinite; }
+  .live-h1 { font-size: 30px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.5px; color: #fff; }
+  @media (max-width: 600px) { .live-h1 { font-size: 24px; } }
+  .live-sub { font-size: 12.5px; color: #90A0C0; max-width: 520px; line-height: 1.6; }
+  .live-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .live-btn {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; padding: 10px 16px;
+    font-size: 12px; font-weight: 700; color: #E4EAF5; cursor: pointer; font-family: inherit;
+  }
+  .live-btn:disabled { opacity: 0.5; cursor: default; }
+  .live-logout { background: none; border: none; color: #6E7C99; font-size: 11.5px; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 0; }
+
+  .live-panel {
+    background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.09); border-radius: 12px;
+    animation: fadeInUp 0.5s ease both;
+  }
+  .live-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 900px) { .live-stat-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 420px) { .live-stat-grid { grid-template-columns: 1fr; } }
+  .live-stat-tile { padding: 20px 22px; }
+  .live-stat-label { font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #6E7C99; margin-bottom: 12px; }
+  .live-stat-value { font-size: 34px; font-weight: 800; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
+  .live-stat-value.accent { color: #00D4E8; }
+  .live-stat-sub { font-size: 11px; color: #6E7C99; margin-top: 8px; }
+
+  .live-grid-a { display: grid; grid-template-columns: 1fr 1.3fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 900px) { .live-grid-a { grid-template-columns: 1fr; } }
+  .live-panel-pad { padding: 22px 24px; }
+  @media (max-width: 600px) { .live-panel-pad { padding: 18px 18px; } }
+  .live-panel-title { font-size: 13.5px; font-weight: 800; color: #fff; margin-bottom: 3px; }
+  .live-panel-sub { font-size: 11px; color: #6E7C99; margin-bottom: 20px; }
+
+  .live-donut-wrap { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center; }
+  .live-donut-legend { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 160px; }
+  .live-legend-row { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+  .live-legend-dot { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+  .live-legend-label { color: #B7C1D9; flex: 1; }
+  .live-legend-value { font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+
+  .live-trend { display: flex; align-items: flex-end; gap: 6px; height: 140px; }
+  .live-trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .live-trend-fill { width: 100%; border-radius: 4px 4px 0 0; min-height: 3px; background: linear-gradient(180deg, #00D4E8, #1B52CE); transition: height 1s cubic-bezier(.2,.8,.2,1); }
+  .live-trend-label { font-size: 8.5px; color: #566280; }
+
+  .live-cat-row + .live-cat-row { margin-top: 14px; }
+  .live-cat-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #D3DAEC; }
+  .live-cat-track { height: 7px; border-radius: 100px; background: rgba(255,255,255,0.07); overflow: hidden; }
+  .live-cat-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #1B52CE, #00D4E8); width: 0; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+
+  .live-table-scroll { overflow-x: auto; }
+  table.live-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 12px; }
+  table.live-table thead tr { border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; }
+  table.live-table th { padding: 0 14px 12px; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #6E7C99; }
+  table.live-table td { padding: 13px 14px; border-bottom: 1px solid rgba(255,255,255,0.055); vertical-align: middle; }
+  table.live-table td.ltcode { color: #00D4E8; font-weight: 700; font-family: ui-monospace, monospace; font-size: 11.5px; }
+  table.live-table td.ltcompany { color: #fff; font-weight: 700; }
+  table.live-table td.ltrisk { font-weight: 800; font-variant-numeric: tabular-nums; }
+
+  .live-status-pill { display: inline-block; padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px; }
+  .live-status-scheduled { background: rgba(148,163,184,0.15); color: #B7C1D9; }
+  .live-status-scanning { background: rgba(0,212,232,0.12); color: #00D4E8; }
+  .live-status-analyzing { background: rgba(245,158,11,0.15); color: #F5B93B; }
+  .live-status-ready { background: rgba(34,197,94,0.15); color: #4ADE80; }
+
+  .live-mini-bar { display: flex; height: 6px; width: 90px; border-radius: 100px; overflow: hidden; background: rgba(255,255,255,0.06); }
+  .live-mini-seg { height: 100%; }
+
+  .live-gate-wrap { max-width: 380px; margin: 60px auto; text-align: center; }
+  .live-gate-icon {
+    width: 52px; height: 52px; margin: 0 auto 20px; border-radius: 100px; background: rgba(0,212,232,0.1);
+    color: #00D4E8; font-size: 22px; display: flex; align-items: center; justify-content: center;
+  }
+  .live-gate-title { font-size: 19px; font-weight: 800; margin-bottom: 6px; color: #fff; }
+  .live-gate-desc { font-size: 12.5px; color: #90A0C0; line-height: 1.6; margin-bottom: 24px; }
+  .live-gate-field { text-align: left; margin-bottom: 14px; }
+  .live-gate-field label {
+    display: block; font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+    color: #6E7C99; margin-bottom: 7px;
+  }
+  .live-gate-field input {
+    width: 100%; box-sizing: border-box; padding: 13px 15px; border: 1px solid rgba(255,255,255,0.14); border-radius: 8px;
+    font-family: inherit; font-size: 13.5px; color: #fff; background: rgba(255,255,255,0.04); outline: none;
+  }
+  .live-gate-field input:focus { border-color: #00D4E8; }
+  .live-gate-error {
+    margin-bottom: 14px; background: rgba(240,60,60,0.12); border: 1px solid rgba(240,60,60,0.3); color: #FF8B8B;
+    font-size: 12.5px; font-weight: 600; padding: 12px 14px; border-radius: 8px; text-align: left;
+  }
+  .live-gate-submit {
+    width: 100%; background: linear-gradient(90deg, #1B52CE, #00A8CE); color: #fff; border: none; border-radius: 8px;
+    padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .live-gate-submit:disabled { opacity: 0.6; cursor: default; }
+
   .footer { border-top: 1px solid var(--xc-border); padding: 22px 24px; background: #fff; }
   .footer-inner {
     max-width: 1180px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;
@@ -294,6 +410,7 @@
     <div class="tabs">
       <button class="tab-btn" id="tab-form" onclick="showView('form')">Formulir</button>
       <button class="tab-btn" id="tab-dash" onclick="showView('dash')">Dashboard</button>
+      <button class="tab-btn" id="tab-live" onclick="showView('live')">Live</button>
     </div>
   </div>
 </div>
@@ -329,6 +446,7 @@
 </div>
 
 <div id="view-dash" class="page" style="display:none;"></div>
+<div id="view-live" style="display:none;"></div>
 
 <div class="footer">
   <div class="footer-inner">
@@ -344,6 +462,15 @@ var API_URL = "https://script.google.com/macros/s/AKfycbxy-8FpKVwE39uXVdCInsHIYu
 var SHEET_URL = "https://docs.google.com/spreadsheets/d/1rMK40NP1PHPUMtPLdhi0M0kh47tlCrxTfCEdgTFVidA/edit";
 var PUBLIC_MAIL = ["gmail.com","yahoo.com","hotmail.com","outlook.com","icloud.com","proton.me","yahoo.co.id","live.com"];
 var PALETTE = ["#1B52CE","#00D4E8","#0B2D7E","#F03C3C","#2563EB","#94A3B8"];
+var SEV_COLORS = { critical: "#F03C3C", high: "#FF8B3D", medium: "#F5B93B", low: "#3B82F6" };
+var SEV_LABELS = { critical: "Critical", high: "High", medium: "Medium", low: "Low" };
+var LIVE_CATEGORIES = [
+  "Broken Access Control", "Exposed API Keys / Secrets", "Outdated TLS Configuration",
+  "SQL Injection Surface", "Missing Security Headers", "Weak Authentication Policy",
+  "Unpatched Known CVEs", "Open Cloud Storage Bucket"
+];
+var LIVE_STATUSES = ["scheduled", "scanning", "analyzing", "ready"];
+var LIVE_STATUS_LABELS = { scheduled: "Scheduled", scanning: "Scanning", analyzing: "Analyzing", ready: "Report Ready" };
 
 var state = {
   view: "form",
@@ -351,13 +478,27 @@ var state = {
   error: "", sending: false, submitted: false, syncOk: false,
   rows: [], loading: false, loadError: false,
   kode: "", showModal: false,
-  dashAuthed: false, dashPassword: "", dashPwError: "", dashChecking: false
+  dashAuthed: false, dashPassword: "", dashPwError: "", dashChecking: false,
+  liveAuthed: false, livePassword: "", liveRows: [], liveLoading: false, liveLoadError: false,
+  livePwError: "", liveChecking: false
 };
 
 try {
   var savedPw = sessionStorage.getItem("xc_dash_pw");
   if (savedPw) { state.dashAuthed = true; state.dashPassword = savedPw; }
+  var savedLivePw = sessionStorage.getItem("xc_live_pw");
+  if (savedLivePw) { state.liveAuthed = true; state.livePassword = savedLivePw; }
 } catch (e) {}
+
+function seededRandom(seed) {
+  var h = 0;
+  for (var i = 0; i < seed.length; i++) { h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0; }
+  return function () {
+    h = Math.imul(h ^ (h >>> 15), h | 1);
+    h ^= h + Math.imul(h ^ (h >>> 7), h | 61);
+    return ((h ^ (h >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 function genKode() {
   var n = Math.floor(Math.random() * 1000000);
@@ -374,11 +515,17 @@ function showView(v) {
   state.view = v;
   document.getElementById("tab-form").className = "tab-btn" + (v === "form" ? " active" : "");
   document.getElementById("tab-dash").className = "tab-btn" + (v === "dash" ? " active" : "");
+  document.getElementById("tab-live").className = "tab-btn" + (v === "live" ? " active" : "");
   document.getElementById("view-form").style.display = v === "form" ? "block" : "none";
   document.getElementById("view-dash").style.display = v === "dash" ? "block" : "none";
+  document.getElementById("view-live").style.display = v === "live" ? "block" : "none";
   if (v === "dash") {
     if (state.dashAuthed) { loadRows(); renderDash(); }
     else { renderDashGate(); }
+  }
+  if (v === "live") {
+    if (state.liveAuthed) { loadLiveRows(); renderLive(); }
+    else { renderLiveGate(); }
   }
 }
 
@@ -454,6 +601,281 @@ function renderDashGate() {
   pwInput.addEventListener("keydown", function (e) { if (e.key === "Enter") submitDashPw(); });
   pwInput.focus();
   document.getElementById("gate-submit").addEventListener("click", submitDashPw);
+}
+
+function loadLiveRows(retriesLeft) {
+  if (!state.liveAuthed || !state.livePassword) return;
+  if (retriesLeft === undefined) retriesLeft = 2;
+  state.liveLoading = true;
+  fetch(API_URL + "?pw=" + encodeURIComponent(state.livePassword), { method: "GET", credentials: "omit" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function (data) {
+      if (!data || !data.ok) throw new Error("unauthorized");
+      state.liveRows = data.rows || [];
+      state.liveLoading = false;
+      state.liveLoadError = false;
+      if (state.view === "live") renderLive();
+    })
+    .catch(function () {
+      if (retriesLeft > 0) {
+        setTimeout(function () { loadLiveRows(retriesLeft - 1); }, 1000);
+        return;
+      }
+      state.liveLoading = false;
+      state.liveLoadError = true;
+      if (state.view === "live") renderLive();
+    });
+}
+
+function refreshLive() {
+  if (state.liveLoading) return;
+  state.liveLoading = true;
+  renderLive();
+  loadLiveRows();
+}
+
+function liveLogout() {
+  state.liveAuthed = false;
+  state.livePassword = "";
+  state.liveRows = [];
+  try { sessionStorage.removeItem("xc_live_pw"); } catch (e) {}
+  renderLiveGate();
+}
+
+function submitLivePw() {
+  var input = document.getElementById("live-gate-pw");
+  var pw = (input ? input.value : "").trim();
+  if (!pw) {
+    state.livePwError = "Masukkan password terlebih dahulu.";
+    renderLiveGate();
+    return;
+  }
+  state.liveChecking = true;
+  state.livePwError = "";
+  renderLiveGate();
+
+  fetch(API_URL + "?pw=" + encodeURIComponent(pw), { method: "GET", credentials: "omit" })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      state.liveChecking = false;
+      if (data && data.ok) {
+        state.liveAuthed = true;
+        state.livePassword = pw;
+        state.liveRows = data.rows || [];
+        state.liveLoading = false;
+        state.liveLoadError = false;
+        try { sessionStorage.setItem("xc_live_pw", pw); } catch (e) {}
+        renderLive();
+      } else {
+        state.livePwError = "Password salah. Coba lagi.";
+        renderLiveGate();
+      }
+    })
+    .catch(function () {
+      state.liveChecking = false;
+      state.livePwError = "Gagal menghubungi server. Coba lagi.";
+      renderLiveGate();
+    });
+}
+
+function renderLiveGate() {
+  var el = document.getElementById("view-live");
+  el.innerHTML =
+    '<div class="live-wrap"><div class="live-inner">' +
+      '<div class="live-gate-wrap">' +
+        '<div class="live-gate-icon">&#128274;</div>' +
+        '<div class="live-gate-title">Xecura Pentest AI &middot; Powered by RED ORYX</div>' +
+        '<p class="live-gate-desc">Masukkan password untuk mengakses live threat intelligence dashboard.</p>' +
+        '<div class="live-gate-field"><label for="live-gate-pw">Password</label><input id="live-gate-pw" type="password" placeholder="Masukkan password"></div>' +
+        (state.livePwError ? '<div class="live-gate-error">' + esc(state.livePwError) + '</div>' : '') +
+        '<button class="live-gate-submit" id="live-gate-submit" ' + (state.liveChecking ? "disabled" : "") + '>' + (state.liveChecking ? "Memeriksa…" : "Buka Live Dashboard") + '</button>' +
+      '</div>' +
+    '</div></div>';
+  var pwInput = document.getElementById("live-gate-pw");
+  pwInput.addEventListener("keydown", function (e) { if (e.key === "Enter") submitLivePw(); });
+  pwInput.focus();
+  document.getElementById("live-gate-submit").addEventListener("click", submitLivePw);
+}
+
+function liveStatsForKode(kode) {
+  var rng = seededRandom(kode || "x");
+  var critical = Math.floor(rng() * 3);
+  var high = 1 + Math.floor(rng() * 5);
+  var medium = 2 + Math.floor(rng() * 8);
+  var low = 3 + Math.floor(rng() * 10);
+  var total = critical + high + medium + low;
+  var risk = Math.min(100, Math.round(critical * 18 + high * 9 + medium * 3 + low * 1 + rng() * 6));
+  var status = LIVE_STATUSES[Math.floor(rng() * LIVE_STATUSES.length)];
+  var targets = 1 + Math.floor(rng() * 3);
+  return { critical: critical, high: high, medium: medium, low: low, total: total, risk: risk, status: status, targets: targets };
+}
+
+function countUp(el, target, duration) {
+  if (!el) return;
+  var start = 0;
+  var startTime = null;
+  function step(ts) {
+    if (startTime === null) startTime = ts;
+    var progress = Math.min(1, (ts - startTime) / duration);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(start + (target - start) * eased).toLocaleString("id-ID");
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function renderLive() {
+  var el = document.getElementById("view-live");
+  var rows = state.liveRows || [];
+
+  if (state.liveLoading && !rows.length) {
+    el.innerHTML = '<div class="live-wrap"><div class="live-inner"><div class="empty-note" style="color:#6E7C99;">Memuat live intelligence…</div></div></div>';
+    return;
+  }
+
+  var perCompany = rows.map(function (r) {
+    return { row: r, stats: liveStatsForKode(r.kode || r.perusahaan) };
+  });
+
+  var totalEngagements = perCompany.length;
+  var totalTargets = perCompany.reduce(function (a, c) { return a + c.stats.targets; }, 0);
+  var totalFindings = perCompany.reduce(function (a, c) { return a + c.stats.total; }, 0);
+  var totalCritical = perCompany.reduce(function (a, c) { return a + c.stats.critical; }, 0);
+  var totalHigh = perCompany.reduce(function (a, c) { return a + c.stats.high; }, 0);
+  var totalMedium = perCompany.reduce(function (a, c) { return a + c.stats.medium; }, 0);
+  var totalLow = perCompany.reduce(function (a, c) { return a + c.stats.low; }, 0);
+  var avgRisk = totalEngagements ? Math.round(perCompany.reduce(function (a, c) { return a + c.stats.risk; }, 0) / totalEngagements) : 0;
+
+  var sevData = [
+    { key: "critical", count: totalCritical },
+    { key: "high", count: totalHigh },
+    { key: "medium", count: totalMedium },
+    { key: "low", count: totalLow }
+  ];
+  var sevTotal = totalCritical + totalHigh + totalMedium + totalLow || 1;
+  var conicParts = []; var cursor = 0;
+  sevData.forEach(function (s) {
+    var pct = s.count / sevTotal * 100;
+    conicParts.push(SEV_COLORS[s.key] + " " + cursor + "% " + (cursor + pct) + "%");
+    cursor += pct;
+  });
+  var conicGradient = sevTotal > 1 || totalFindings > 0
+    ? "conic-gradient(" + conicParts.join(", ") + ")"
+    : "conic-gradient(#1F2A47 0% 100%)";
+
+  var trendSeed = seededRandom("trend-" + totalFindings + "-" + totalEngagements);
+  var trendBuckets = [];
+  var day = 86400000, today = new Date(); today.setHours(0, 0, 0, 0);
+  var base = Math.max(1, Math.round(totalFindings / 10));
+  for (var i = 13; i >= 0; i--) {
+    var d2 = new Date(today.getTime() - i * day);
+    var v = Math.max(0, Math.round(base * (0.4 + trendSeed() * 1.3) + (i === 0 ? base * 0.6 : 0)));
+    trendBuckets.push({ count: v, label: d2.getDate() + "/" + (d2.getMonth() + 1), last: i === 0 });
+  }
+  var trendMax = Math.max.apply(null, trendBuckets.map(function (b) { return b.count; }).concat([1]));
+
+  var catSeed = seededRandom("categories-" + totalFindings);
+  var catData = LIVE_CATEGORIES.map(function (name) {
+    return { name: name, count: Math.round(2 + catSeed() * (6 + totalFindings)) };
+  }).sort(function (a, b) { return b.count - a.count; }).slice(0, 6);
+  var catMax = catData.length ? catData[0].count : 1;
+
+  var html = '';
+  html += '<div class="live-wrap"><div class="live-inner">';
+
+  html += '<div class="live-header">';
+  html += '<div><div class="live-badge"><span class="live-dot"></span>LIVE</div>';
+  html += '<h1 class="live-h1">Xecura Pentest AI &middot; Powered by RED ORYX</h1>';
+  html += '<p class="live-sub">Ringkasan live lintas engagement dan target aktif, digabungkan dari seluruh pendaftar Cybersecurity Clinic.</p></div>';
+  html += '<div class="live-actions">';
+  html += '<button class="live-btn" id="live-refresh-btn" onclick="refreshLive()" ' + (state.liveLoading ? "disabled" : "") + '>' + (state.liveLoading ? "Memperbarui…" : "&#8635; Perbarui Data") + '</button>';
+  html += '<button class="live-logout" onclick="liveLogout()">Kunci Live</button>';
+  html += '</div></div>';
+
+  html += '<div class="live-stat-grid">';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.02s;"><div class="live-stat-label">Total Engagement</div><div class="live-stat-value" id="cu-eng">0</div><div class="live-stat-sub">' + totalTargets + ' target dipindai</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.08s;"><div class="live-stat-label">Total Findings</div><div class="live-stat-value accent" id="cu-find">0</div><div class="live-stat-sub">Seluruh severity</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.14s;"><div class="live-stat-label">Critical Findings</div><div class="live-stat-value" id="cu-crit" style="color:' + SEV_COLORS.critical + ';">0</div><div class="live-stat-sub">Perlu remediasi segera</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.2s;"><div class="live-stat-label">Avg Risk Score</div><div class="live-stat-value" id="cu-risk">0</div><div class="live-stat-sub">Skala 0&ndash;100</div></div>';
+  html += '</div>';
+
+  html += '<div class="live-grid-a">';
+  html += '<div class="live-panel live-panel-pad" style="animation-delay:.26s;">';
+  html += '<div class="live-panel-title">Findings by Severity</div><div class="live-panel-sub">Distribusi seluruh temuan</div>';
+  html += '<div class="live-donut-wrap">';
+  html += '<div style="width:130px;height:130px;border-radius:100%;background:' + conicGradient + ';flex:none;display:flex;align-items:center;justify-content:center;">';
+  html += '<div style="width:78px;height:78px;border-radius:100%;background:#0B1226;display:flex;align-items:center;justify-content:center;flex-direction:column;">';
+  html += '<div style="font-size:20px;font-weight:800;color:#fff;">' + totalFindings + '</div><div style="font-size:8px;color:#6E7C99;letter-spacing:1px;">FINDINGS</div>';
+  html += '</div></div>';
+  html += '<div class="live-donut-legend">';
+  sevData.forEach(function (s) {
+    var pct = Math.round(s.count / sevTotal * 100);
+    html += '<div class="live-legend-row"><div class="live-legend-dot" style="background:' + SEV_COLORS[s.key] + ';"></div><div class="live-legend-label">' + SEV_LABELS[s.key] + '</div><div class="live-legend-value">' + s.count + '</div><div style="color:#566280;font-size:11px;">' + pct + '%</div></div>';
+  });
+  html += '</div></div></div>';
+
+  html += '<div class="live-panel live-panel-pad" style="animation-delay:.32s;">';
+  html += '<div class="live-panel-title">Findings Discovered</div><div class="live-panel-sub">14 hari terakhir, seluruh engagement</div>';
+  html += '<div class="live-trend">';
+  trendBuckets.forEach(function (b) {
+    html += '<div class="live-trend-col"><div style="font-size:9.5px;font-weight:700;color:' + (b.last ? "#00D4E8" : "#B7C1D9") + ';">' + b.count + '</div><div class="live-trend-fill" data-h="' + Math.max(3, Math.round(b.count / trendMax * 100)) + '" style="height:0;' + (b.last ? "background:linear-gradient(180deg,#00D4E8,#F03C3C);" : "") + '"></div><div class="live-trend-label">' + b.label + '</div></div>';
+  });
+  html += '</div></div>';
+  html += '</div>';
+
+  html += '<div class="live-panel live-panel-pad" style="margin-bottom:14px;animation-delay:.38s;">';
+  html += '<div class="live-panel-title">Top Kategori Kerentanan</div><div class="live-panel-sub">Digabungkan lintas seluruh target</div>';
+  catData.forEach(function (c) {
+    var w = Math.round(c.count / catMax * 100);
+    html += '<div class="live-cat-row"><div class="live-cat-head"><span>' + esc(c.name) + '</span><span style="color:#6E7C99;">' + c.count + '</span></div><div class="live-cat-track"><div class="live-cat-fill" data-w="' + w + '"></div></div></div>';
+  });
+  html += '</div>';
+
+  html += '<div class="live-panel" style="animation-delay:.44s;">';
+  html += '<div class="live-panel-pad" style="padding-bottom:10px;"><div class="live-panel-title">Engagement per Perusahaan</div><div class="live-panel-sub" style="margin-bottom:0;">Merujuk kode registrasi Cybersecurity Clinic</div></div>';
+  if (!perCompany.length) {
+    html += '<div class="empty-note" style="color:#6E7C99;padding:0 24px 24px;">Belum ada engagement aktif.</div>';
+  } else {
+    html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Perusahaan</th><th>Status</th><th>Findings</th><th>Risk</th></tr></thead><tbody>';
+    perCompany.slice().sort(function (a, b) { return b.stats.risk - a.stats.risk; }).forEach(function (c) {
+      var s = c.stats;
+      var riskColor = s.risk >= 60 ? SEV_COLORS.critical : s.risk >= 35 ? SEV_COLORS.high : "#4ADE80";
+      html += '<tr>';
+      html += '<td class="ltcode">' + esc(c.row.kode || "&mdash;") + '</td>';
+      html += '<td class="ltcompany">' + esc(c.row.perusahaan) + '</td>';
+      html += '<td><span class="live-status-pill live-status-' + s.status + '">' + LIVE_STATUS_LABELS[s.status] + '</span></td>';
+      html += '<td><div class="live-mini-bar">';
+      ["critical", "high", "medium", "low"].forEach(function (k) {
+        var segPct = s.total ? (s[k] / s.total * 100) : 0;
+        if (segPct > 0) html += '<div class="live-mini-seg" style="width:' + segPct + '%;background:' + SEV_COLORS[k] + ';"></div>';
+      });
+      html += '</div></td>';
+      html += '<td class="ltrisk" style="color:' + riskColor + ';">' + s.risk + '</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+  html += '</div>';
+
+  html += '</div></div>';
+  el.innerHTML = html;
+
+  countUp(document.getElementById("cu-eng"), totalEngagements, 900);
+  countUp(document.getElementById("cu-find"), totalFindings, 900);
+  countUp(document.getElementById("cu-crit"), totalCritical, 900);
+  countUp(document.getElementById("cu-risk"), avgRisk, 900);
+
+  setTimeout(function () {
+    document.querySelectorAll(".live-trend-fill").forEach(function (elx) {
+      elx.style.height = elx.getAttribute("data-h") + "%";
+    });
+    document.querySelectorAll(".live-cat-fill").forEach(function (elx) {
+      elx.style.width = elx.getAttribute("data-w") + "%";
+    });
+  }, 60);
 }
 
 function set(key) {
