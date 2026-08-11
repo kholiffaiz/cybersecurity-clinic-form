@@ -64,17 +64,11 @@
   .brand-label {
     font-size: 10px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase; color: var(--xc-cyan);
   }
-  .brand-partner {
-    background: #fff; border-radius: 6px; padding: 5px 10px; display: flex; align-items: center;
-  }
-  .brand-partner img { height: 28px; display: block; }
   @media (max-width: 480px) {
     .header { padding: 0 16px; }
     .brand { gap: 10px; }
     .brand-divider { display: none; }
     .brand-label { display: none; }
-    .brand-partner { padding: 4px 8px; }
-    .brand-partner img { height: 20px; }
   }
   .tabs {
     display: flex; gap: 6px; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 100px;
@@ -123,6 +117,16 @@
   }
   .card-body { padding: 34px 36px 36px; }
   @media (max-width: 600px) { .card-body { padding: 24px 20px 26px; } }
+
+  .card-partner {
+    display: flex; align-items: center; gap: 10px; padding: 14px 36px;
+    border-bottom: 1px solid var(--xc-border); background: var(--xc-bg-light);
+  }
+  @media (max-width: 600px) { .card-partner { padding: 12px 20px; } }
+  .card-partner-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--xc-text-muted);
+  }
+  .card-partner img { height: 20px; display: block; }
 
   .field { margin-bottom: 18px; }
   .field label {
@@ -404,8 +408,6 @@
   <div class="header-inner">
     <div class="brand">
       <img src="assets/logo-xecura-horizontal-white.png" alt="Xecura">
-      <div class="brand-divider"></div>
-      <div class="brand-partner"><img src="assets/logo-onesmartservices.png" alt="OneSmartServices"></div>
     </div>
     <div class="tabs">
       <button class="tab-btn" id="tab-form" onclick="showView('form')">Formulir</button>
@@ -440,6 +442,10 @@
 
     <div class="card">
       <div class="gradient-bar"></div>
+      <div class="card-partner">
+        <span class="card-partner-label">Didukung oleh</span>
+        <img src="assets/logo-onesmartservices.png" alt="OneSmartServices">
+      </div>
       <div class="card-body" id="card-body"></div>
     </div>
   </div>
