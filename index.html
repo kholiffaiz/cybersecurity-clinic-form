@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cybersecurity Clinic — Pendaftaran &amp; Dashboard | Xecura</title>
+<meta name="description" content="Formulir pendaftaran Cybersecurity Clinic Xecura dan dashboard statistik peserta.">
+<style>
+  @font-face {
+    font-family: 'Google Sans';
+    src: url('fonts/GoogleSans-VariableFont_GRAD_opsz_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --xc-navy: #0B2D7E;
+    --xc-blue: #1B52CE;
+    --xc-blue-mid: #2563EB;
+    --xc-blue-light: #EBF2FF;
+    --xc-cyan: #00D4E8;
+    --xc-red: #F03C3C;
+    --xc-text: #1E293B;
+    --xc-text-body: #374151;
+    --xc-text-muted: #6B7280;
+    --xc-white: #FFFFFF;
+    --xc-bg: #F0F4F8;
+    --xc-bg-light: #F8FAFC;
+    --xc-border: #E2E8F0;
+    --xc-gradient: linear-gradient(90deg, var(--xc-blue) 0%, var(--xc-cyan) 55%, var(--xc-red) 100%);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--xc-bg);
+    font-family: 'Google Sans', system-ui, -apple-system, sans-serif;
+    color: var(--xc-text);
+  }
+  a { color: var(--xc-blue); text-decoration: none; }
+  a:hover { color: var(--xc-blue-mid); }
+  input::placeholder { color: #9AA5B4; }
+  button { font-family: inherit; }
+
+  .header {
+    background: var(--xc-navy);
+    padding: 0 24px;
+  }
+  .header-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 74px;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 18px; }
+  .brand img { height: 26px; display: block; }
+  .brand-divider { width: 1px; height: 26px; background: rgba(255,255,255,0.22); }
+  .brand-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase; color: var(--xc-cyan);
+  }
+  .tabs {
+    display: flex; gap: 6px; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 100px;
+  }
+  .tab-btn {
+    border: none; border-radius: 100px; padding: 9px 20px; font-size: 12.5px; font-weight: 700;
+    cursor: pointer; transition: all .15s; background: transparent; color: rgba(255,255,255,0.7);
+  }
+  .tab-btn.active { background: #fff; color: var(--xc-navy); }
+  .gradient-bar { height: 4px; background: var(--xc-gradient); }
+
+  .page { max-width: 1180px; margin: 0 auto; padding: 44px 24px 64px; }
+
+  /* ---- Form view ---- */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+  @media (max-width: 860px) { .form-grid { grid-template-columns: 1fr; } }
+
+  .eyebrow {
+    display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase;
+    color: var(--xc-blue); background: var(--xc-blue-light); padding: 7px 14px; border-radius: 100px;
+  }
+  .h1 { font-size: 40px; font-weight: 800; line-height: 1.18; margin: 20px 0 16px; letter-spacing: -0.8px; }
+  .lead { font-size: 14px; line-height: 1.72; color: var(--xc-text-body); margin: 0 0 30px; max-width: 460px; }
+
+  .steps { display: flex; flex-direction: column; gap: 14px; max-width: 440px; }
+  .step {
+    display: flex; gap: 14px; align-items: flex-start; background: #fff; border: 1px solid var(--xc-border);
+    border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 12px rgba(11,45,126,0.08);
+  }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 8px; background: var(--xc-blue-light); color: var(--xc-blue);
+    font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none;
+  }
+  .step-title { font-size: 13px; font-weight: 700; }
+  .step-desc { font-size: 12px; color: var(--xc-text-muted); line-height: 1.6; }
+
+  .card {
+    background: #fff; border: 1px solid var(--xc-border); border-radius: 10px;
+    box-shadow: 0 4px 28px rgba(11,45,126,0.12); overflow: hidden;
+  }
+  .card-body { padding: 34px 36px 36px; }
+
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block; font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--xc-text-muted); margin-bottom: 7px;
+  }
+  .field input {
+    width: 100%; box-sizing: border-box; padding: 13px 15px; border: 1px solid var(--xc-border); border-radius: 8px;
+    font-family: inherit; font-size: 13.5px; color: var(--xc-text); background: var(--xc-bg-light); outline: none;
+  }
+  .field input:focus { border-color: var(--xc-blue); background: #fff; }
+  .field-hint { font-size: 11px; color: var(--xc-text-muted); margin-top: 7px; }
+
+  .error-box {
+    margin-top: 18px; background: #FEF0F0; border: 1px solid #F7C8C8; color: #B92626;
+    font-size: 12.5px; font-weight: 600; padding: 12px 14px; border-radius: 8px;
+  }
+
+  .submit-btn {
+    width: 100%; margin-top: 26px; background: var(--xc-blue); color: #fff; border: none; border-radius: 8px;
+    padding: 15px; font-size: 14px; font-weight: 700; letter-spacing: 0.2px; cursor: pointer;
+  }
+  .submit-btn:disabled { background: #6B87C9; cursor: default; }
+  .form-footnote { font-size: 11px; color: var(--xc-text-muted); line-height: 1.65; margin-top: 16px; text-align: center; }
+
+  .success { text-align: center; padding: 34px 8px 24px; }
+  .success-check {
+    width: 56px; height: 56px; margin: 0 auto 20px; border-radius: 100px; background: var(--xc-blue-light);
+    color: var(--xc-blue); font-size: 26px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  }
+  .success-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+  .success-msg { font-size: 13px; line-height: 1.7; color: var(--xc-text-body); margin: 0 auto 8px; max-width: 340px; }
+  .success-note { font-size: 11.5px; color: var(--xc-text-muted); margin: 0 0 26px; }
+  .success-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn-secondary {
+    background: #fff; color: var(--xc-blue); border: 1px solid #C7D8F7; border-radius: 8px; padding: 12px 22px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--xc-blue); color: #fff; border: none; border-radius: 8px; padding: 12px 22px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+
+  /* ---- Dashboard view ---- */
+  .dash-header {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; flex-wrap: wrap;
+  }
+  .dash-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase; color: var(--xc-text-muted); margin-bottom: 8px; }
+  .dash-h1 { font-size: 30px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+  .sheet-link {
+    background: #fff; border: 1px solid var(--xc-border); border-radius: 8px; padding: 11px 18px;
+    font-size: 12.5px; font-weight: 700; color: var(--xc-blue); display: inline-block;
+  }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2,1fr); } }
+  .stat-tile { border-radius: 10px; padding: 22px 24px; }
+  .stat-tile.primary { background: var(--xc-navy); color: #fff; box-shadow: 0 2px 12px rgba(11,45,126,0.14); }
+  .stat-tile.secondary { background: #fff; border: 1px solid var(--xc-border); box-shadow: 0 2px 12px rgba(11,45,126,0.08); }
+  .stat-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
+  .stat-tile.primary .stat-label { color: var(--xc-cyan); }
+  .stat-tile.secondary .stat-label { color: var(--xc-text-muted); }
+  .stat-value { font-size: 38px; font-weight: 800; line-height: 1; }
+  .stat-tile.secondary .stat-value { color: var(--xc-blue); }
+  .stat-sub { font-size: 11.5px; margin-top: 10px; }
+  .stat-tile.primary .stat-sub { color: rgba(255,255,255,0.7); }
+  .stat-tile.secondary .stat-sub { color: var(--xc-text-muted); }
+
+  .panel-grid-a { display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .panel-grid-b { display: grid; grid-template-columns: 1fr 1.55fr; gap: 16px; }
+  @media (max-width: 900px) { .panel-grid-a, .panel-grid-b { grid-template-columns: 1fr; } }
+
+  .panel { background: #fff; border: 1px solid var(--xc-border); border-radius: 10px; box-shadow: 0 2px 12px rgba(11,45,126,0.08); }
+  .panel-pad { padding: 24px 26px 20px; }
+  .panel-title { font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+  .panel-sub { font-size: 11.5px; color: var(--xc-text-muted); margin-bottom: 24px; }
+
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 170px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+  .bar-count { font-size: 10.5px; font-weight: 700; color: var(--xc-text); }
+  .bar-fill { width: 100%; border-radius: 6px 6px 0 0; min-height: 3px; }
+  .bar-label { font-size: 9.5px; color: var(--xc-text-muted); letter-spacing: 0.2px; }
+
+  .tld-row + .tld-row { margin-top: 16px; }
+  .tld-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 7px; }
+  .tld-head span:last-child { color: var(--xc-text-muted); font-weight: 600; }
+  .tld-track { height: 8px; border-radius: 100px; background: #EDF1F7; overflow: hidden; }
+  .tld-fill { height: 100%; border-radius: 100px; }
+
+  .company-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #EDF1F7; }
+  .company-rank {
+    width: 24px; height: 24px; border-radius: 6px; background: var(--xc-blue-light); color: var(--xc-blue);
+    font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none;
+  }
+  .company-name { flex: 1; font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .company-count { font-size: 12.5px; font-weight: 800; color: var(--xc-blue); }
+
+  table.registrants { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.registrants thead tr { background: var(--xc-navy); color: #fff; text-align: left; }
+  table.registrants th { padding: 11px 26px; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; }
+  table.registrants th:not(:first-child), table.registrants td:not(:first-child) { padding-left: 14px; padding-right: 14px; }
+  table.registrants td { padding: 12px 26px; border-bottom: 1px solid #EDF1F7; }
+  table.registrants td.tname { font-weight: 700; color: var(--xc-text); }
+  table.registrants td.tcompany { color: var(--xc-text-body); }
+  table.registrants td.tdomain { color: var(--xc-blue); font-weight: 600; }
+  table.registrants td.tdate { color: var(--xc-text-muted); white-space: nowrap; }
+
+  .empty-note { font-size: 12.5px; color: var(--xc-text-muted); padding: 20px 0; text-align: center; }
+
+  .footer { border-top: 1px solid var(--xc-border); padding: 22px 24px; background: #fff; }
+  .footer-inner {
+    max-width: 1180px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;
+    gap: 20px; font-size: 11px; color: var(--xc-text-muted); flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <img src="assets/logo-xecura-horizontal-white.png" alt="Xecura">
+      <div class="brand-divider"></div>
+      <div class="brand-label">Cybersecurity Clinic</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn" id="tab-form" onclick="showView('form')">Formulir</button>
+      <button class="tab-btn" id="tab-dash" onclick="showView('dash')">Dashboard</button>
+    </div>
+  </div>
+</div>
+<div class="gradient-bar"></div>
+
+<div id="view-form" class="page">
+  <div class="form-grid">
+    <div>
+      <div class="eyebrow">Pendaftaran Peserta</div>
+      <h1 class="h1">Daftarkan organisasi Anda untuk sesi Cybersecurity Clinic</h1>
+      <p class="lead">Sesi konsultasi keamanan siber bersama tim Xecura. Setiap pendaftar akan menerima ringkasan awal postur keamanan domain publik organisasinya sebelum sesi berlangsung.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div><div class="step-title">Isi formulir</div><div class="step-desc">Empat isian singkat, kurang dari satu menit.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div><div class="step-title">Verifikasi domain</div><div class="step-desc">Tim Xecura memeriksa domain yang Anda daftarkan.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div><div class="step-title">Jadwal sesi dikirim</div><div class="step-desc">Undangan dikirim ke alamat e-mail terdaftar.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="gradient-bar"></div>
+      <div class="card-body" id="card-body"></div>
+    </div>
+  </div>
+</div>
+
+<div id="view-dash" class="page" style="display:none;"></div>
+
+<div class="footer">
+  <div class="footer-inner">
+    <div>Xecura — PT Gan Mitra Usaha · Cybersecurity Clinic 2026</div>
+    <div id="footer-note">Memuat data…</div>
+  </div>
+</div>
+
+<script>
+var API_URL = "https://script.google.com/macros/s/AKfycbxy-8FpKVwE39uXVdCInsHIYuCqB1YkQBEIiT7q80s051yjDX7lU04fjFRo2q0VPPNi6w/exec";
+var SHEET_URL = "https://docs.google.com/spreadsheets/d/1rMK40NP1PHPUMtPLdhi0M0kh47tlCrxTfCEdgTFVidA/edit";
+var PUBLIC_MAIL = ["gmail.com","yahoo.com","hotmail.com","outlook.com","icloud.com","proton.me","yahoo.co.id","live.com"];
+var PALETTE = ["#1B52CE","#00D4E8","#0B2D7E","#F03C3C","#2563EB","#94A3B8"];
+
+var state = {
+  view: "form",
+  nama: "", perusahaan: "", email: "", domain: "",
+  error: "", sending: false, submitted: false, syncOk: false,
+  rows: [], loading: true, loadError: false
+};
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+
+function showView(v) {
+  state.view = v;
+  document.getElementById("tab-form").className = "tab-btn" + (v === "form" ? " active" : "");
+  document.getElementById("tab-dash").className = "tab-btn" + (v === "dash" ? " active" : "");
+  document.getElementById("view-form").style.display = v === "form" ? "block" : "none";
+  document.getElementById("view-dash").style.display = v === "dash" ? "block" : "none";
+  if (v === "dash") { loadRows(); renderDash(); }
+}
+
+function set(key) {
+  return function (e) {
+    state[key] = e.target.value;
+    if (state.error) {
+      state.error = "";
+      var box = document.getElementById("form-error-box");
+      if (box) box.parentNode.removeChild(box);
+    }
+  };
+}
+
+function fmtDate(ts) {
+  var d = new Date(ts);
+  var b = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+  return d.getDate() + " " + b[d.getMonth()] + " " + d.getFullYear();
+}
+
+function submit() {
+  var nama = (state.nama || "").trim();
+  var perusahaan = (state.perusahaan || "").trim();
+  var email = (state.email || "").trim();
+  var domainRaw = (state.domain || "").trim();
+
+  if (!nama || !perusahaan || !email || !domainRaw) {
+    state.error = "Mohon lengkapi seluruh isian sebelum mengirim.";
+    renderForm(); return;
+  }
+  if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email)) {
+    state.error = "Format alamat e-mail belum benar.";
+    renderForm(); return;
+  }
+  var domain = domainRaw.replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/\/.*$/, "").toLowerCase();
+  if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(domain)) {
+    state.error = "Format domain belum benar. Contoh: perusahaan.co.id";
+    renderForm(); return;
+  }
+
+  state.sending = true; state.error = "";
+  renderForm();
+
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    credentials: "omit",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ nama: nama, perusahaan: perusahaan, email: email, domain: domain })
+  }).then(function () {
+    finishSubmit(true);
+  }).catch(function () {
+    finishSubmit(false);
+  });
+}
+
+function finishSubmit(ok) {
+  state.sending = false;
+  state.submitted = true;
+  state.syncOk = ok;
+  state.nama = state.perusahaan = state.email = state.domain = "";
+  renderForm();
+  setTimeout(loadRows, 1200);
+}
+
+function resetForm() {
+  state.submitted = false; state.error = "";
+  renderForm();
+}
+
+function renderForm() {
+  var body = document.getElementById("card-body");
+  if (state.submitted) {
+    body.innerHTML =
+      '<div class="success">' +
+        '<div class="success-check">&#10003;</div>' +
+        '<div class="success-title">Pendaftaran diterima</div>' +
+        '<p class="success-msg">Terima kasih. Undangan sesi akan dikirim ke alamat e-mail yang Anda daftarkan.</p>' +
+        '<p class="success-note">' + (state.syncOk ? "Baris berhasil ditambahkan ke Google Spreadsheet." : "Tercatat, namun konfirmasi sinkronisasi belum diterima. Data tetap terkirim ke server.") + '</p>' +
+        '<div class="success-actions">' +
+          '<button class="btn-primary" onclick="resetForm()">Daftarkan peserta lain</button>' +
+          '<button class="btn-secondary" onclick="showView(\'dash\')">Lihat dashboard</button>' +
+        '</div>' +
+      '</div>';
+    return;
+  }
+
+  body.innerHTML =
+    '<div>' +
+      '<div style="font-size:19px;font-weight:800;margin-bottom:4px;">Formulir Pendaftaran</div>' +
+      '<div style="font-size:12px;color:var(--xc-text-muted);margin-bottom:26px;">Seluruh isian wajib dilengkapi.</div>' +
+      '<div>' +
+        '<div class="field"><label for="f-nama">Nama Lengkap</label><input id="f-nama" placeholder="Contoh: Andi Prasetyo" value="' + esc(state.nama) + '"></div>' +
+        '<div class="field"><label for="f-perusahaan">Perusahaan</label><input id="f-perusahaan" placeholder="Contoh: PT Borneo Indobara" value="' + esc(state.perusahaan) + '"></div>' +
+        '<div class="field"><label for="f-email">E-mail</label><input id="f-email" type="email" placeholder="nama@perusahaan.co.id" value="' + esc(state.email) + '"></div>' +
+        '<div class="field"><label for="f-domain">Domain / Alamat Website</label><input id="f-domain" placeholder="perusahaan.co.id" value="' + esc(state.domain) + '">' +
+          '<div class="field-hint">Cukup nama domain, tanpa https:// — misalnya xecura.id</div>' +
+        '</div>' +
+      '</div>' +
+      (state.error ? '<div class="error-box" id="form-error-box">' + esc(state.error) + '</div>' : '') +
+      '<button class="submit-btn" id="btn-submit" ' + (state.sending ? "disabled" : "") + '>' + (state.sending ? "Mengirim…" : "Kirim Pendaftaran") + '</button>' +
+      '<div class="form-footnote">Data disimpan ke Google Spreadsheet pendaftaran Xecura dan hanya digunakan untuk keperluan penyelenggaraan Cybersecurity Clinic.</div>' +
+    '</div>';
+
+  document.getElementById("f-nama").addEventListener("input", set("nama"));
+  document.getElementById("f-perusahaan").addEventListener("input", set("perusahaan"));
+  document.getElementById("f-email").addEventListener("input", set("email"));
+  document.getElementById("f-domain").addEventListener("input", set("domain"));
+  document.getElementById("btn-submit").addEventListener("click", submit);
+}
+
+function loadRows(retriesLeft) {
+  if (retriesLeft === undefined) retriesLeft = 2;
+  state.loading = true;
+  fetch(API_URL, { method: "GET", credentials: "omit" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function (data) {
+      state.rows = (data && data.rows) || [];
+      state.loading = false;
+      state.loadError = false;
+      updateFooter();
+      if (state.view === "dash") renderDash();
+    })
+    .catch(function () {
+      if (retriesLeft > 0) {
+        setTimeout(function () { loadRows(retriesLeft - 1); }, 1000);
+        return;
+      }
+      state.loading = false;
+      state.loadError = true;
+      updateFooter();
+      if (state.view === "dash") renderDash();
+    });
+}
+
+function updateFooter() {
+  var el = document.getElementById("footer-note");
+  if (state.loadError) el.textContent = "Gagal memuat data spreadsheet.";
+  else el.textContent = state.rows.length + " pendaftar tercatat · Tersambung ke Google Spreadsheet";
+}
+
+function renderDash() {
+  var el = document.getElementById("view-dash");
+  var rows = state.rows.slice().sort(function (a, b) { return a.ts - b.ts; });
+  var total = rows.length;
+
+  if (state.loading && !rows.length) {
+    el.innerHTML = '<div class="empty-note">Memuat statistik…</div>';
+    return;
+  }
+
+  var companies = {};
+  rows.forEach(function (r) { var k = (r.perusahaan || "").trim(); if (k) companies[k] = (companies[k] || 0) + 1; });
+  var compList = Object.keys(companies).map(function (n) { return { name: n, count: companies[n] }; })
+    .sort(function (a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+
+  var domains = {};
+  rows.forEach(function (r) { if (r.domain) domains[r.domain] = 1; });
+
+  var publikCount = rows.filter(function (r) {
+    var d = ((r.email || "").split("@")[1] || "").toLowerCase();
+    return PUBLIC_MAIL.indexOf(d) >= 0;
+  }).length;
+  var korporatPct = total ? Math.round((total - publikCount) / total * 100) : 0;
+
+  var tldMap = {};
+  rows.forEach(function (r) {
+    if (!r.domain) return;
+    var p = r.domain.split(".");
+    var t = "." + (p.length >= 3 ? p.slice(-2).join(".") : p.slice(-1)[0]);
+    tldMap[t] = (tldMap[t] || 0) + 1;
+  });
+  var tldAll = Object.keys(tldMap).map(function (n) { return { name: n, count: tldMap[n] }; })
+    .sort(function (a, b) { return b.count - a.count; });
+  var tldTop = tldAll.slice(0, 5);
+  var rest = tldAll.slice(5).reduce(function (a, x) { return a + x.count; }, 0);
+  if (rest) tldTop.push({ name: "lainnya", count: rest });
+  var tldMax = tldTop.length ? tldTop[0].count : 1;
+
+  var day = 86400000, today = new Date(); today.setHours(0, 0, 0, 0);
+  var buckets = [];
+  for (var i = 13; i >= 0; i--) {
+    var start = today.getTime() - i * day;
+    var c = rows.filter(function (r) { return r.ts >= start && r.ts < start + day; }).length;
+    var d2 = new Date(start);
+    buckets.push({ count: c, label: d2.getDate() + "/" + (d2.getMonth() + 1), last: i === 0 });
+  }
+  var maxC = Math.max.apply(null, buckets.map(function (b) { return b.count; }).concat([1]));
+
+  var last7 = rows.filter(function (r) { return r.ts >= Date.now() - 7 * day; }).length;
+  var latest = rows.slice(-6).reverse();
+
+  var html = '';
+  html += '<div class="dash-header">';
+  html +=   '<div><div class="dash-eyebrow">Statistik Pendaftaran</div><h1 class="dash-h1">Dashboard Cybersecurity Clinic</h1></div>';
+  html +=   '<a class="sheet-link" href="' + SHEET_URL + '" target="_blank" rel="noopener">Buka Google Spreadsheet &rarr;</a>';
+  html += '</div>';
+
+  html += '<div class="stat-grid">';
+  html +=   '<div class="stat-tile primary"><div class="stat-label">Total Pendaftar</div><div class="stat-value">' + total + '</div><div class="stat-sub">' + last7 + ' pendaftar dalam 7 hari terakhir</div></div>';
+  html +=   '<div class="stat-tile secondary"><div class="stat-label">Perusahaan Unik</div><div class="stat-value">' + compList.length + '</div><div class="stat-sub">Rata-rata ' + (compList.length ? (total / compList.length).toFixed(1) : "0") + ' peserta / perusahaan</div></div>';
+  html +=   '<div class="stat-tile secondary"><div class="stat-label">E-mail Korporat</div><div class="stat-value">' + korporatPct + '<span style="font-size:18px;">%</span></div><div class="stat-sub">' + publikCount + ' memakai e-mail publik</div></div>';
+  html +=   '<div class="stat-tile secondary"><div class="stat-label">Domain Terdaftar</div><div class="stat-value">' + Object.keys(domains).length + '</div><div class="stat-sub">Siap untuk pemeriksaan awal</div></div>';
+  html += '</div>';
+
+  html += '<div class="panel-grid-a">';
+  html +=   '<div class="panel panel-pad">';
+  html +=     '<div class="panel-title">Pendaftaran per Hari</div><div class="panel-sub">14 hari terakhir</div>';
+  html +=     '<div class="bar-chart">';
+  buckets.forEach(function (b) {
+    var h = Math.max(3, Math.round(b.count / maxC * 118));
+    html += '<div class="bar-col"><div class="bar-count">' + b.count + '</div><div class="bar-fill" style="height:' + h + 'px;background:' + (b.last ? "var(--xc-cyan)" : "var(--xc-blue)") + ';"></div><div class="bar-label">' + b.label + '</div></div>';
+  });
+  html +=     '</div>';
+  html +=   '</div>';
+  html +=   '<div class="panel panel-pad">';
+  html +=     '<div class="panel-title">Sebaran Ekstensi Domain</div><div class="panel-sub">Berdasarkan domain yang didaftarkan</div>';
+  if (!tldTop.length) {
+    html += '<div class="empty-note">Belum ada data domain.</div>';
+  } else {
+    tldTop.forEach(function (t, i) {
+      var pct = total ? Math.round(t.count / total * 100) : 0;
+      var w = Math.round(t.count / tldMax * 100);
+      html += '<div class="tld-row"><div class="tld-head"><span>' + esc(t.name) + '</span><span>' + t.count + ' &middot; ' + pct + '%</span></div><div class="tld-track"><div class="tld-fill" style="width:' + w + '%;background:' + PALETTE[i % PALETTE.length] + ';"></div></div></div>';
+    });
+  }
+  html +=   '</div>';
+  html += '</div>';
+
+  html += '<div class="panel-grid-b">';
+  html +=   '<div class="panel panel-pad">';
+  html +=     '<div class="panel-title">Perusahaan Terbanyak</div><div class="panel-sub">Jumlah peserta terdaftar</div>';
+  if (!compList.length) {
+    html += '<div class="empty-note">Belum ada pendaftar.</div>';
+  } else {
+    compList.slice(0, 6).forEach(function (c, i) {
+      html += '<div class="company-row"><div class="company-rank">' + (i + 1) + '</div><div class="company-name">' + esc(c.name) + '</div><div class="company-count">' + c.count + '</div></div>';
+    });
+  }
+  html +=   '</div>';
+  html +=   '<div class="panel">';
+  html +=     '<div class="panel-pad" style="padding-bottom:18px;"><div class="panel-title">Pendaftar Terbaru</div><div class="panel-sub" style="margin-bottom:0;">Sinkron dengan baris terakhir di spreadsheet</div></div>';
+  if (!latest.length) {
+    html += '<div class="empty-note">Belum ada pendaftar.</div>';
+  } else {
+    html += '<table class="registrants"><thead><tr><th>Nama</th><th>Perusahaan</th><th>Domain</th><th>Tanggal</th></tr></thead><tbody>';
+    latest.forEach(function (r) {
+      html += '<tr><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td class="tdate">' + fmtDate(r.ts) + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+  html +=   '</div>';
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+renderForm();
+showView("form");
+loadRows();
+</script>
+</body>
+</html>
