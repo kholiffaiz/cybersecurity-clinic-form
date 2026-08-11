@@ -201,7 +201,8 @@
 
   .panel-grid-a { display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px; margin-bottom: 16px; }
   .panel-grid-b { display: grid; grid-template-columns: 1fr 1.55fr; gap: 16px; }
-  @media (max-width: 900px) { .panel-grid-a, .panel-grid-b { grid-template-columns: 1fr; } }
+  .panel-grid-c { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 900px) { .panel-grid-a, .panel-grid-b, .panel-grid-c { grid-template-columns: 1fr; } }
 
   .panel { background: #fff; border: 1px solid var(--xc-border); border-radius: 10px; box-shadow: 0 2px 12px rgba(11,45,126,0.08); }
   .panel-pad { padding: 24px 26px 20px; }
@@ -211,6 +212,11 @@
 
   .bar-chart-scroll { overflow-x: auto; }
   .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 170px; min-width: 480px; }
+  .bar-chart-compact { min-width: 0; }
+  .flag-pill {
+    display: inline-block; padding: 3px 8px; border-radius: 100px; font-size: 10px; font-weight: 700;
+    background: #FEF3C7; color: #92400E;
+  }
   .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
   .bar-count { font-size: 10.5px; font-weight: 700; color: var(--xc-text); }
   .bar-fill { width: 100%; border-radius: 6px 6px 0 0; min-height: 3px; }
@@ -231,8 +237,8 @@
   .company-count { font-size: 12.5px; font-weight: 800; color: var(--xc-blue); }
 
   .table-scroll { overflow-x: auto; }
-  table.registrants { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 12px; }
-  table.registrants.registrants-full { min-width: 760px; }
+  table.registrants { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 12px; }
+  table.registrants.registrants-full { min-width: 860px; }
   table.registrants thead tr { background: var(--xc-navy); color: #fff; text-align: left; }
   table.registrants th { padding: 11px 26px; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; }
   table.registrants th:not(:first-child), table.registrants td:not(:first-child) { padding-left: 14px; padding-right: 14px; }
@@ -434,7 +440,7 @@
     <div>
       <div class="eyebrow">Pendaftaran Peserta</div>
       <h1 class="h1">Daftarkan organisasi Anda untuk sesi Cybersecurity Clinic</h1>
-      <p class="lead">Sesi konsultasi keamanan siber bersama Konsultan terkemuka di Indonesia. Setiap pendaftar akan menerima ringkasan awal postur keamanan domain publik organisasinya sebelum sesi berlangsung.</p>
+      <p class="lead">Sesi konsultasi keamanan siber bersama Konsultan terkemuka di Indonesia. Setiap pendaftar akan menerima ringkasan awal postur keamanan domain publik organisasinya selama sesi berlangsung.</p>
       <div class="steps">
         <div class="step">
           <div class="step-num">1</div>
@@ -1166,6 +1172,10 @@ function renderDash() {
   var domains = {};
   rows.forEach(function (r) { if (r.domain) domains[r.domain] = 1; });
 
+  var domainFirstTs = {};
+  rows.forEach(function (r) { if (r.domain && !(r.domain in domainFirstTs)) domainFirstTs[r.domain] = r.ts; });
+  function isRepeatDomain(r) { return !!(r.domain && domainFirstTs[r.domain] !== r.ts); }
+
   var publikCount = rows.filter(function (r) {
     var d = ((r.email || "").split("@")[1] || "").toLowerCase();
     return PUBLIC_MAIL.indexOf(d) >= 0;
@@ -1188,7 +1198,7 @@ function renderDash() {
 
   var day = 86400000, today = new Date(); today.setHours(0, 0, 0, 0);
   var buckets = [];
-  for (var i = 13; i >= 0; i--) {
+  for (var i = 2; i >= 0; i--) {
     var start = today.getTime() - i * day;
     var c = rows.filter(function (r) { return r.ts >= start && r.ts < start + day; }).length;
     var d2 = new Date(start);
@@ -1217,15 +1227,15 @@ function renderDash() {
   html +=   '<div class="stat-tile secondary"><div class="stat-label">Domain Terdaftar</div><div class="stat-value">' + Object.keys(domains).length + '</div><div class="stat-sub">Siap untuk pemeriksaan awal</div></div>';
   html += '</div>';
 
-  html += '<div class="panel-grid-a">';
+  html += '<div class="panel-grid-c">';
   html +=   '<div class="panel panel-pad">';
-  html +=     '<div class="panel-title">Pendaftaran per Hari</div><div class="panel-sub">14 hari terakhir</div>';
-  html +=     '<div class="bar-chart-scroll"><div class="bar-chart">';
+  html +=     '<div class="panel-title">Pendaftaran per Hari</div><div class="panel-sub">3 hari terakhir</div>';
+  html +=     '<div class="bar-chart bar-chart-compact">';
   buckets.forEach(function (b) {
     var h = Math.max(3, Math.round(b.count / maxC * 118));
     html += '<div class="bar-col"><div class="bar-count">' + b.count + '</div><div class="bar-fill" style="height:' + h + 'px;background:' + (b.last ? "var(--xc-cyan)" : "var(--xc-blue)") + ';"></div><div class="bar-label">' + b.label + '</div></div>';
   });
-  html +=     '</div></div>';
+  html +=     '</div>';
   html +=   '</div>';
   html +=   '<div class="panel panel-pad">';
   html +=     '<div class="panel-title">Sebaran Ekstensi Domain</div><div class="panel-sub">Berdasarkan domain yang didaftarkan</div>';
@@ -1239,9 +1249,6 @@ function renderDash() {
     });
   }
   html +=   '</div>';
-  html += '</div>';
-
-  html += '<div class="panel-grid-b">';
   html +=   '<div class="panel panel-pad">';
   html +=     '<div class="panel-title">Perusahaan Terbanyak</div><div class="panel-sub">Jumlah peserta terdaftar</div>';
   if (!compList.length) {
@@ -1252,27 +1259,28 @@ function renderDash() {
     });
   }
   html +=   '</div>';
-  html +=   '<div class="panel"' + (state.dashShowAll ? ' style="grid-column:1/-1;"' : '') + '>';
-  html +=     '<div class="panel-pad" style="padding-bottom:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;">';
-  html +=       '<div><div class="panel-title">Pendaftar Terbaru</div><div class="panel-sub" style="margin-bottom:0;">' + (state.dashShowAll ? "Menampilkan seluruh " + rows.length + " pendaftar" : "Sinkron dengan baris terakhir di spreadsheet") + '</div></div>';
-  html +=       '<button class="sheet-link" onclick="toggleDashShowAll()">' + (state.dashShowAll ? "Tampilkan lebih sedikit" : "Tampilkan semua pendaftar") + '</button>';
-  html +=     '</div>';
+  html += '</div>';
+
+  html += '<div class="panel">';
+  html +=   '<div class="panel-pad" style="padding-bottom:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;">';
+  html +=     '<div><div class="panel-title">Pendaftar Terbaru</div><div class="panel-sub" style="margin-bottom:0;">' + (state.dashShowAll ? "Menampilkan seluruh " + rows.length + " pendaftar" : "Sinkron dengan baris terakhir di spreadsheet") + '</div></div>';
+  html +=     '<button class="sheet-link" onclick="toggleDashShowAll()">' + (state.dashShowAll ? "Tampilkan lebih sedikit" : "Tampilkan semua pendaftar") + '</button>';
+  html +=   '</div>';
   if (!displayRows.length) {
     html += '<div class="empty-note">Belum ada pendaftar.</div>';
   } else if (state.dashShowAll) {
-    html += '<div class="table-scroll"><table class="registrants registrants-full"><thead><tr><th>Kode</th><th>Nama</th><th>Perusahaan</th><th>Email</th><th>Domain</th><th>Timestamp</th></tr></thead><tbody>';
+    html += '<div class="table-scroll"><table class="registrants registrants-full"><thead><tr><th>Kode</th><th>Nama</th><th>Perusahaan</th><th>Email</th><th>Domain</th><th>Flag</th><th>Timestamp</th></tr></thead><tbody>';
     displayRows.forEach(function (r) {
-      html += '<tr><td class="tdomain">' + esc(r.kode || "&mdash;") + '</td><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tcompany">' + esc(r.email) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td class="tdate">' + fmtDateTime(r.ts) + '</td></tr>';
+      html += '<tr><td class="tdomain">' + esc(r.kode || "&mdash;") + '</td><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tcompany">' + esc(r.email) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td>' + (isRepeatDomain(r) ? '<span class="flag-pill">Domain Berulang</span>' : '') + '</td><td class="tdate">' + fmtDateTime(r.ts) + '</td></tr>';
     });
     html += '</tbody></table></div>';
   } else {
-    html += '<div class="table-scroll"><table class="registrants"><thead><tr><th>Nama</th><th>Perusahaan</th><th>Domain</th><th>Tanggal</th></tr></thead><tbody>';
+    html += '<div class="table-scroll"><table class="registrants"><thead><tr><th>Nama</th><th>Perusahaan</th><th>Domain</th><th>Flag</th><th>Tanggal</th></tr></thead><tbody>';
     displayRows.forEach(function (r) {
-      html += '<tr><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td class="tdate">' + fmtDate(r.ts) + '</td></tr>';
+      html += '<tr><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td>' + (isRepeatDomain(r) ? '<span class="flag-pill">Domain Berulang</span>' : '') + '</td><td class="tdate">' + fmtDate(r.ts) + '</td></tr>';
     });
     html += '</tbody></table></div>';
   }
-  html +=   '</div>';
   html += '</div>';
 
   el.innerHTML = html;
