@@ -176,6 +176,8 @@
     background: #fff; border: 1px solid var(--xc-border); border-radius: 8px; padding: 11px 18px;
     font-size: 12.5px; font-weight: 700; color: var(--xc-blue); display: inline-block;
   }
+  button.sheet-link { cursor: pointer; font-family: inherit; }
+  button.sheet-link:disabled { color: var(--xc-text-muted); cursor: default; }
 
   .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 16px; }
   @media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2,1fr); } }
@@ -378,6 +380,13 @@ function showView(v) {
     if (state.dashAuthed) { loadRows(); renderDash(); }
     else { renderDashGate(); }
   }
+}
+
+function refreshDash() {
+  if (state.loading) return;
+  state.loading = true;
+  renderDash();
+  loadRows();
 }
 
 function dashLogout() {
@@ -725,6 +734,7 @@ function renderDash() {
   html += '<div class="dash-header">';
   html +=   '<div><div class="dash-eyebrow">Statistik Pendaftaran</div><h1 class="dash-h1">Dashboard Cybersecurity Clinic</h1></div>';
   html +=   '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">';
+  html +=     '<button class="sheet-link" id="dash-refresh-btn" onclick="refreshDash()" ' + (state.loading ? "disabled" : "") + '>' + (state.loading ? "Memperbarui…" : "&#8635; Perbarui Data") + '</button>';
   html +=     '<a class="sheet-link" href="' + SHEET_URL + '" target="_blank" rel="noopener">Buka Google Spreadsheet &rarr;</a>';
   html +=     '<button class="dash-logout" onclick="dashLogout()">Kunci dashboard</button>';
   html +=   '</div>';
