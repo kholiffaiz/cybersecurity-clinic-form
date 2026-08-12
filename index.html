@@ -613,6 +613,16 @@ var LIVE_CATEGORIES = [
 ];
 var LIVE_STATUSES = ["scheduled", "scanning", "analyzing", "ready"];
 var LIVE_STATUS_LABELS = { scheduled: "Scheduled", scanning: "Scanning", analyzing: "Analyzing", ready: "Report Ready" };
+var LIVE_STATUS_ALIASES = {
+  "scheduled": "scheduled",
+  "scanning": "scanning",
+  "analyzing": "analyzing", "analysing": "analyzing",
+  "ready": "ready", "report ready": "ready", "done": "ready", "selesai": "ready", "completed": "ready"
+};
+function normalizeSheetStatus(raw) {
+  var key = (raw || "").toString().trim().toLowerCase();
+  return LIVE_STATUS_ALIASES[key] || null;
+}
 
 var state = {
   view: "form",
@@ -920,7 +930,10 @@ function renderLive() {
   }
 
   var perCompany = rows.map(function (r) {
-    return { row: r, stats: liveStatsForKode(r.kode || r.perusahaan) };
+    var stats = liveStatsForKode(r.kode || r.perusahaan);
+    var realStatus = normalizeSheetStatus(r.status);
+    if (realStatus) stats.status = realStatus;
+    return { row: r, stats: stats };
   });
 
   var totalEngagements = perCompany.length;
