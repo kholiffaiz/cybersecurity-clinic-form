@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scan &amp; Daftar — Cybersecurity Clinic | Xecura</title>
+<meta name="description" content="Pindai kode QR untuk mendaftar sesi Cybersecurity Clinic bersama Xecura.">
+<style>
+  @font-face {
+    font-family: 'Google Sans';
+    src: url('../fonts/GoogleSans-VariableFont_GRAD_opsz_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --xc-navy: #0B2D7E;
+    --xc-blue: #1B52CE;
+    --xc-blue-mid: #2563EB;
+    --xc-blue-light: #EBF2FF;
+    --xc-cyan: #00D4E8;
+    --xc-red: #F03C3C;
+    --xc-text: #1E293B;
+    --xc-text-body: #374151;
+    --xc-text-muted: #6B7280;
+    --xc-bg: #F0F4F8;
+    --xc-bg-light: #F8FAFC;
+    --xc-border: #E2E8F0;
+    --xc-gradient: linear-gradient(90deg, var(--xc-blue) 0%, var(--xc-cyan) 55%, var(--xc-red) 100%);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--xc-bg);
+    font-family: 'Google Sans', system-ui, -apple-system, sans-serif;
+    color: var(--xc-text);
+  }
+  a { color: var(--xc-blue); text-decoration: none; }
+  a:hover { color: var(--xc-blue-mid); }
+
+  .header { background: var(--xc-navy); padding: 0 24px; }
+  .header-inner {
+    max-width: 720px; margin: 0 auto; display: flex; align-items: center;
+    min-height: 74px; padding: 12px 0;
+  }
+  .brand img { height: 26px; display: block; }
+  .gradient-bar { height: 4px; background: var(--xc-gradient); }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
+  @media (max-width: 600px) { .wrap { padding: 32px 16px 48px; } }
+
+  .eyebrow {
+    display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase;
+    color: var(--xc-blue); background: var(--xc-blue-light); padding: 7px 14px; border-radius: 100px;
+  }
+  .h1 {
+    font-size: 34px; font-weight: 800; line-height: 1.2; margin: 18px 0 12px; letter-spacing: -0.6px;
+    text-align: center;
+  }
+  @media (max-width: 600px) { .h1 { font-size: 25px; } }
+  .lead {
+    font-size: 14px; line-height: 1.72; color: var(--xc-text-body); margin: 0 auto 36px;
+    max-width: 480px; text-align: center;
+  }
+  .center { display: flex; flex-direction: column; align-items: center; }
+
+  .qr-card {
+    background: #fff; border: 1px solid var(--xc-border); border-radius: 16px;
+    box-shadow: 0 4px 28px rgba(11,45,126,0.12); overflow: hidden; width: 100%; max-width: 320px;
+  }
+  .qr-card .gradient-bar { height: 4px; }
+  .qr-card-body { padding: 26px 26px 22px; display: flex; flex-direction: column; align-items: center; }
+  .qr-card img { width: 100%; max-width: 220px; height: auto; display: block; border-radius: 8px; }
+  .qr-caption {
+    margin-top: 16px; font-size: 10.5px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--xc-text-muted); text-align: center;
+  }
+  .qr-url { margin-top: 4px; font-size: 12.5px; font-weight: 700; color: var(--xc-blue); text-align: center; word-break: break-all; }
+
+  .btn-open {
+    margin-top: 22px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--xc-blue); color: #fff; border: none; border-radius: 8px; padding: 13px 26px;
+    font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .btn-open:hover { background: var(--xc-blue-mid); color: #fff; }
+
+  .card-partner {
+    display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;
+    margin: 34px 0 0;
+  }
+  .card-partner-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--xc-text-muted);
+  }
+  .card-partner img { height: 18px; display: block; }
+  .card-partner-square { height: 24px !important; }
+
+  .video-section { margin-top: 56px; }
+  .video-title { font-size: 18px; font-weight: 800; text-align: center; margin: 0 0 6px; }
+  .video-sub { font-size: 12.5px; color: var(--xc-text-muted); text-align: center; margin: 0 0 20px; }
+  .video-frame {
+    width: 100%; border-radius: 14px; overflow: hidden; background: #000;
+    box-shadow: 0 4px 28px rgba(11,45,126,0.14); border: 1px solid var(--xc-border);
+  }
+  .video-frame video { width: 100%; height: auto; display: block; }
+
+  .footer { border-top: 1px solid var(--xc-border); padding: 22px 24px; background: #fff; margin-top: 56px; }
+  .footer-inner {
+    max-width: 720px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;
+    gap: 20px; font-size: 11px; color: var(--xc-text-muted); flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <a class="brand" href="/"><img src="../assets/logo-xecura-horizontal-white.png" alt="Xecura"></a>
+  </div>
+</div>
+<div class="gradient-bar"></div>
+
+<div class="wrap">
+  <div class="center">
+    <span class="eyebrow">Pendaftaran Peserta</span>
+    <h1 class="h1">Daftarkan organisasi Anda untuk sesi Cybersecurity Clinic</h1>
+    <p class="lead">Pindai kode QR di bawah ini dengan kamera ponsel Anda, atau buka tautan formulir untuk mendaftarkan organisasi Anda dalam beberapa langkah singkat.</p>
+
+    <div class="qr-card">
+      <div class="gradient-bar"></div>
+      <div class="qr-card-body">
+        <img src="../assets/qr-scanme.jpg" alt="QR Code pendaftaran Cybersecurity Clinic">
+        <div class="qr-caption">Scan untuk mendaftar</div>
+        <div class="qr-url">cybersecurity-clinic-form.pages.dev</div>
+      </div>
+    </div>
+
+    <a class="btn-open" href="/">Buka Formulir Pendaftaran</a>
+
+    <div class="card-partner">
+      <span class="card-partner-label">Didukung oleh</span>
+      <img src="../assets/logo-deltamas.png" alt="Deltamas" class="card-partner-square">
+      <img src="../assets/logo-onesmartservices.png" alt="OneSmartServices">
+      <img src="../assets/logo-xecura-horizontal.png" alt="Xecura">
+    </div>
+  </div>
+
+  <div class="video-section">
+    <div class="video-title">Kenali Xecura Pentest AI</div>
+    <div class="video-sub">Powered by RED ORYX &middot; Ringkasan singkat layanan cybersecurity Xecura</div>
+    <div class="video-frame">
+      <video controls preload="metadata" playsinline>
+        <source src="../video/xecura-explainer.mp4" type="video/mp4">
+        Browser Anda tidak mendukung pemutaran video.
+      </video>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-inner">
+    <div>OneSmartService</div>
+    <div>Deltamas Cybersecurity Awareness 2026</div>
+  </div>
+</div>
+
+</body>
+</html>
