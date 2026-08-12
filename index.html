@@ -889,12 +889,6 @@ function liveStatsForKode(kode) {
   return { critical: critical, high: high, medium: medium, low: low, total: total, risk: risk, status: status, targets: targets, durationHours: durationHours, darkwebCreds: darkwebCreds };
 }
 
-function fmtDuration(hours) {
-  if (!hours) return "&mdash;";
-  if (hours < 24) return Math.round(hours) + " jam";
-  return (hours / 24).toFixed(1) + " hari";
-}
-
 function isLiveActive(status) {
   return status === "scanning" || status === "analyzing";
 }
@@ -970,9 +964,6 @@ function renderLive() {
   var completed = perCompany.filter(function (c) { return c.stats.status === "ready"; });
   var completedCount = completed.length;
   var waitingCount = totalEngagements - completedCount;
-  var avgCompletionHours = completed.length
-    ? completed.reduce(function (a, c) { return a + c.stats.durationHours; }, 0) / completed.length
-    : 0;
 
   var totalDarkweb = perCompany.reduce(function (a, c) { return a + c.stats.darkwebCreds; }, 0);
   var affectedDarkweb = perCompany.filter(function (c) { return c.stats.darkwebCreds > 0; }).length;
@@ -1024,7 +1015,7 @@ function renderLive() {
   html += '<div class="live-panel live-stat-tile" style="animation-delay:.02s;"><div class="live-stat-head"><div class="live-stat-label">Total Engagement</div>' + statIcon('target', '#00D4E8') + '</div><div class="live-stat-value" id="cu-eng">0</div><div class="live-stat-sub">' + totalTargets + ' target dipindai</div></div>';
   html += '<div class="live-panel live-stat-tile" style="animation-delay:.06s;"><div class="live-stat-head"><div class="live-stat-label">Selesai</div>' + statIcon('check', '#4ADE80') + '</div><div class="live-stat-value" id="cu-done" style="color:#4ADE80;">0</div><div class="live-stat-sub">Report ready</div></div>';
   html += '<div class="live-panel live-stat-tile" style="animation-delay:.1s;"><div class="live-stat-head"><div class="live-stat-label">Menunggu Antrian</div>' + statIcon('clock', '#F5B93B') + '</div><div class="live-stat-value" id="cu-wait" style="color:#F5B93B;">0</div><div class="live-stat-sub">Belum selesai</div></div>';
-  html += '<div class="live-panel live-stat-tile" style="animation-delay:.14s;"><div class="live-stat-head"><div class="live-stat-label">Rata-rata Waktu Selesai</div>' + statIcon('timer', '#00D4E8') + '</div><div class="live-stat-value" style="font-size:26px;">' + fmtDuration(avgCompletionHours) + '</div><div class="live-stat-sub">Dari engagement selesai</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.14s;"><div class="live-stat-head"><div class="live-stat-label">Rata-rata Waktu Selesai</div>' + statIcon('timer', '#00D4E8') + '</div><div class="live-stat-value" style="font-size:26px;">25 menit</div><div class="live-stat-sub">Dari engagement selesai</div></div>';
   html += '<div class="live-panel live-stat-tile" style="animation-delay:.18s;"><div class="live-stat-head"><div class="live-stat-label">Avg Risk Score</div>' + statIcon('pulse', '#00D4E8') + '</div><div class="live-stat-value" id="cu-risk">0</div><div class="live-stat-sub">Skala 0&ndash;100</div></div>';
   html += '</div>';
 
