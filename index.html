@@ -334,8 +334,9 @@
   }
   .live-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 14px; }
   .live-stat-grid-5 { grid-template-columns: repeat(5,1fr); }
-  @media (max-width: 900px) { .live-stat-grid, .live-stat-grid-5 { grid-template-columns: repeat(2,1fr); } }
-  @media (max-width: 420px) { .live-stat-grid, .live-stat-grid-5 { grid-template-columns: 1fr; } }
+  .live-stat-grid-3 { grid-template-columns: repeat(3,1fr); }
+  @media (max-width: 900px) { .live-stat-grid, .live-stat-grid-5, .live-stat-grid-3 { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 420px) { .live-stat-grid, .live-stat-grid-5, .live-stat-grid-3 { grid-template-columns: 1fr; } }
   .live-stat-tile { padding: 20px 22px; }
   .live-stat-label { font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #6E7C99; margin-bottom: 12px; }
   .live-stat-value { font-size: 34px; font-weight: 800; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -736,7 +737,8 @@ function liveStatsForKode(kode) {
   var status = LIVE_STATUSES[Math.floor(rng() * LIVE_STATUSES.length)];
   var targets = 1 + Math.floor(rng() * 3);
   var durationHours = 4 + Math.round(rng() * 68);
-  return { critical: critical, high: high, medium: medium, low: low, total: total, risk: risk, status: status, targets: targets, durationHours: durationHours };
+  var darkwebCreds = Math.floor(rng() * rng() * 220);
+  return { critical: critical, high: high, medium: medium, low: low, total: total, risk: risk, status: status, targets: targets, durationHours: durationHours, darkwebCreds: darkwebCreds };
 }
 
 function fmtDuration(hours) {
@@ -791,6 +793,10 @@ function renderLive() {
   var avgCompletionHours = completed.length
     ? completed.reduce(function (a, c) { return a + c.stats.durationHours; }, 0) / completed.length
     : 0;
+
+  var totalDarkweb = perCompany.reduce(function (a, c) { return a + c.stats.darkwebCreds; }, 0);
+  var affectedDarkweb = perCompany.filter(function (c) { return c.stats.darkwebCreds > 0; }).length;
+  var avgDarkweb = totalEngagements ? Math.round(totalDarkweb / totalEngagements) : 0;
 
   var sevData = [
     { key: "critical", count: totalCritical },
@@ -850,6 +856,13 @@ function renderLive() {
   html += '<div class="live-panel live-stat-tile" style="animation-delay:.38s;"><div class="live-stat-label">Low</div><div class="live-stat-value" id="cu-low" style="color:' + SEV_COLORS.low + ';">0</div><div class="live-stat-sub">Prioritas rendah</div></div>';
   html += '</div>';
 
+  html += '<div class="live-section-label">Dark Web Exposure</div>';
+  html += '<div class="live-stat-grid live-stat-grid-3">';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.4s;"><div class="live-stat-label">Kredensial Bocor</div><div class="live-stat-value" id="cu-dw" style="color:#F03C3C;">0</div><div class="live-stat-sub">Ditemukan di dark web</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.42s;"><div class="live-stat-label">Perusahaan Terdampak</div><div class="live-stat-value" id="cu-dw-affected" style="color:#F5B93B;">0</div><div class="live-stat-sub">Dari ' + totalEngagements + ' engagement</div></div>';
+  html += '<div class="live-panel live-stat-tile" style="animation-delay:.44s;"><div class="live-stat-label">Rata-rata per Engagement</div><div class="live-stat-value">' + avgDarkweb + '</div><div class="live-stat-sub">Kredensial per target</div></div>';
+  html += '</div>';
+
   html += '<div class="live-grid-a">';
   html += '<div class="live-panel live-panel-pad" style="animation-delay:.42s;">';
   html += '<div class="live-panel-title">Findings by Severity</div><div class="live-panel-sub">Distribusi seluruh temuan</div>';
@@ -879,10 +892,11 @@ function renderLive() {
   if (!perCompany.length) {
     html += '<div class="empty-note" style="color:#6E7C99;padding:0 24px 24px;">Belum ada engagement aktif.</div>';
   } else {
-    html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Status</th><th>Findings</th><th>Risk</th></tr></thead><tbody>';
+    html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Status</th><th>Findings</th><th>Risk</th><th>Kredensial Bocor</th></tr></thead><tbody>';
     perCompany.slice().sort(function (a, b) { return b.stats.risk - a.stats.risk; }).forEach(function (c) {
       var s = c.stats;
       var riskColor = s.risk >= 60 ? SEV_COLORS.critical : s.risk >= 35 ? SEV_COLORS.high : "#4ADE80";
+      var dwColor = s.darkwebCreds >= 50 ? SEV_COLORS.critical : s.darkwebCreds >= 10 ? SEV_COLORS.high : s.darkwebCreds > 0 ? "#F5B93B" : "#6E7C99";
       html += '<tr>';
       html += '<td class="ltcode">' + esc(c.row.kode || "&mdash;") + '</td>';
       html += '<td><span class="live-status-pill live-status-' + s.status + '">' + LIVE_STATUS_LABELS[s.status] + '</span>' + (isLiveActive(s.status) ? '<span class="ai-spin"></span>' : '') + '</td>';
@@ -893,6 +907,7 @@ function renderLive() {
       });
       html += '</div></td>';
       html += '<td class="ltrisk" style="color:' + riskColor + ';">' + s.risk + '</td>';
+      html += '<td style="color:' + dwColor + ';font-weight:600;">' + (s.darkwebCreds > 0 ? s.darkwebCreds : "&mdash;") + '</td>';
       html += '</tr>';
     });
     html += '</tbody></table></div>';
@@ -911,6 +926,8 @@ function renderLive() {
   countUp(document.getElementById("cu-med"), totalMedium, 900);
   countUp(document.getElementById("cu-low"), totalLow, 900);
   countUp(document.getElementById("cu-risk"), avgRisk, 900);
+  countUp(document.getElementById("cu-dw"), totalDarkweb, 900);
+  countUp(document.getElementById("cu-dw-affected"), affectedDarkweb, 900);
 
   setTimeout(function () {
     document.querySelectorAll(".live-cat-fill").forEach(function (elx) {
