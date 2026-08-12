@@ -587,6 +587,14 @@ var PUBLIC_MAIL = ["gmail.com","yahoo.com","hotmail.com","outlook.com","icloud.c
 var PALETTE = ["#1B52CE","#00D4E8","#0B2D7E","#F03C3C","#2563EB","#94A3B8"];
 var SEV_COLORS = { critical: "#F03C3C", high: "#FF8B3D", medium: "#F5B93B", low: "#3B82F6" };
 var SEV_LABELS = { critical: "Critical", high: "High", medium: "Medium", low: "Low" };
+var SEV_ORDER = ["critical", "high", "medium", "low"];
+function topSeverity(s) {
+  for (var i = 0; i < SEV_ORDER.length; i++) {
+    var key = SEV_ORDER[i];
+    if (s[key] > 0) return key;
+  }
+  return null;
+}
 var STAT_ICONS = {
   target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".6" fill="currentColor" stroke="none"/>',
   check: '<circle cx="12" cy="12" r="8.5"/><path d="M8 12.3l2.6 2.6L16 9.2"/>',
@@ -1070,10 +1078,14 @@ function renderLive() {
   } else {
     html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Status</th><th>Findings</th><th>Risk</th><th>Kredensial Bocor</th><th>Estimasi Kerugian</th></tr></thead><tbody>';
     perCompany.slice().sort(function (a, b) {
-      return LIVE_STATUS_ORDER[a.stats.status] - LIVE_STATUS_ORDER[b.stats.status] || b.stats.risk - a.stats.risk;
+      var sevA = SEV_ORDER.indexOf(topSeverity(a.stats)); if (sevA < 0) sevA = 99;
+      var sevB = SEV_ORDER.indexOf(topSeverity(b.stats)); if (sevB < 0) sevB = 99;
+      return LIVE_STATUS_ORDER[a.stats.status] - LIVE_STATUS_ORDER[b.stats.status] || sevA - sevB || b.stats.risk - a.stats.risk;
     }).forEach(function (c) {
       var s = c.stats;
-      var riskColor = s.risk >= 60 ? SEV_COLORS.critical : s.risk >= 35 ? SEV_COLORS.high : "#4ADE80";
+      var riskSev = topSeverity(s);
+      var riskColor = riskSev ? SEV_COLORS[riskSev] : "#4ADE80";
+      var riskLabel = riskSev ? SEV_LABELS[riskSev] : "&mdash;";
       var dwColor = s.darkwebCreds >= 50 ? SEV_COLORS.critical : s.darkwebCreds >= 10 ? SEV_COLORS.high : s.darkwebCreds > 0 ? "#F5B93B" : "#6E7C99";
       html += '<tr>';
       html += '<td class="ltcode">' + esc(c.row.kode || "&mdash;") + '</td>';
@@ -1084,7 +1096,7 @@ function renderLive() {
         if (segPct > 0) html += '<div class="live-mini-seg" style="width:' + segPct + '%;background:' + SEV_COLORS[k] + ';"></div>';
       });
       html += '</div></td>';
-      html += '<td class="ltrisk" style="color:' + riskColor + ';">' + s.risk + '</td>';
+      html += '<td class="ltrisk" style="color:' + riskColor + ';">' + riskLabel + '</td>';
       html += '<td style="color:' + dwColor + ';font-weight:600;">' + (s.darkwebCreds > 0 ? s.darkwebCreds : "&mdash;") + '</td>';
       html += '<td style="color:#F03C3C;font-weight:600;">' + (s.lostEstimation != null ? "$" + s.lostEstimation.toLocaleString("en-US") + "+" : "&mdash;") + '</td>';
       html += '</tr>';
