@@ -242,11 +242,32 @@
   table.registrants thead tr { background: var(--xc-navy); color: #fff; text-align: left; }
   table.registrants th { padding: 11px 26px; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; }
   table.registrants th:not(:first-child), table.registrants td:not(:first-child) { padding-left: 14px; padding-right: 14px; }
+  table.registrants th.sortable { cursor: pointer; user-select: none; white-space: nowrap; transition: color .2s ease; }
+  table.registrants th.sortable:hover { color: var(--xc-cyan); }
+  table.registrants th.sortable .sort-arrow { display: inline-block; margin-left: 4px; opacity: .35; font-size: 9px; }
+  table.registrants th.sortable.sort-active .sort-arrow { opacity: 1; color: var(--xc-cyan); }
   table.registrants td { padding: 12px 26px; border-bottom: 1px solid #EDF1F7; }
   table.registrants td.tname { font-weight: 700; color: var(--xc-text); }
   table.registrants td.tcompany { color: var(--xc-text-body); }
   table.registrants td.tdomain { color: var(--xc-blue); font-weight: 600; }
   table.registrants td.tdate { color: var(--xc-text-muted); white-space: nowrap; }
+
+  .dash-search-wrap { position: relative; width: 100%; max-width: 260px; }
+  .dash-search-wrap svg {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px;
+    color: var(--xc-text-muted); pointer-events: none;
+  }
+  .dash-search-wrap input {
+    width: 100%; box-sizing: border-box; padding: 9px 30px 9px 32px; border: 1px solid var(--xc-border); border-radius: 8px;
+    font-family: inherit; font-size: 12.5px; color: var(--xc-text); background: var(--xc-bg-light); outline: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .dash-search-wrap input:focus { border-color: var(--xc-blue); background: #fff; }
+  .dash-search-clear {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: none; background: none; cursor: pointer;
+    color: var(--xc-text-muted); font-size: 15px; line-height: 1; padding: 4px 6px; font-family: inherit;
+  }
+  .dash-search-clear:hover { color: var(--xc-text); }
 
   .empty-note { font-size: 12.5px; color: var(--xc-text-muted); padding: 20px 0; text-align: center; }
 
@@ -567,6 +588,7 @@ var state = {
   rows: [], loading: false, loadError: false,
   kode: "", showModal: false,
   dashAuthed: false, dashPassword: "", dashPwError: "", dashChecking: false, dashShowAll: false,
+  dashSearch: "", dashSortKey: "ts", dashSortDir: "desc",
   liveAuthed: false, livePassword: "", liveRows: [], liveLoading: false, liveLoadError: false,
   livePwError: "", liveChecking: false
 };
@@ -1027,6 +1049,36 @@ function toggleDashShowAll() {
   renderDash();
 }
 
+function dashSetSearch(v) {
+  state.dashSearch = v;
+  renderDash();
+}
+
+function dashClearSearch() {
+  state.dashSearch = "";
+  renderDash();
+}
+
+function dashSort(key) {
+  if (state.dashSortKey === key) {
+    state.dashSortDir = state.dashSortDir === "asc" ? "desc" : "asc";
+  } else {
+    state.dashSortKey = key;
+    state.dashSortDir = key === "ts" ? "desc" : "asc";
+  }
+  renderDash();
+}
+
+function sortArrow(key) {
+  if (state.dashSortKey !== key) return '<span class="sort-arrow">&#8645;</span>';
+  return '<span class="sort-arrow">' + (state.dashSortDir === "asc" ? "&#9650;" : "&#9660;") + '</span>';
+}
+
+function sortTh(key, label) {
+  var active = state.dashSortKey === key ? " sort-active" : "";
+  return '<th class="sortable' + active + '" onclick="dashSort(\'' + key + '\')">' + label + sortArrow(key) + '</th>';
+}
+
 function submit() {
   var nama = (state.nama || "").trim();
   var perusahaan = (state.perusahaan || "").trim();
@@ -1235,6 +1287,9 @@ function updateFooter() {
 
 function renderDash() {
   var el = document.getElementById("view-dash");
+  var searchEl = document.getElementById("dash-search");
+  var searchFocused = searchEl && document.activeElement === searchEl;
+  var searchSel = searchFocused ? [searchEl.selectionStart, searchEl.selectionEnd] : null;
   var rows = state.rows.slice().sort(function (a, b) { return a.ts - b.ts; });
   var total = rows.length;
 
@@ -1286,9 +1341,32 @@ function renderDash() {
   var maxC = Math.max.apply(null, buckets.map(function (b) { return b.count; }).concat([1]));
 
   var last7 = rows.filter(function (r) { return r.ts >= Date.now() - 7 * day; }).length;
-  var latest = rows.slice(-6).reverse();
-  var allSorted = rows.slice().reverse();
-  var displayRows = state.dashShowAll ? allSorted : latest;
+
+  var searchQuery = (state.dashSearch || "").trim().toLowerCase();
+  var searching = !!searchQuery;
+  function matchesSearch(r) {
+    return (r.nama || "").toLowerCase().indexOf(searchQuery) >= 0 ||
+      (r.perusahaan || "").toLowerCase().indexOf(searchQuery) >= 0 ||
+      (r.email || "").toLowerCase().indexOf(searchQuery) >= 0 ||
+      (r.domain || "").toLowerCase().indexOf(searchQuery) >= 0 ||
+      (r.kode || "").toLowerCase().indexOf(searchQuery) >= 0;
+  }
+  var baseRows = searching ? rows.filter(matchesSearch) : rows.slice();
+
+  var sortKey = state.dashSortKey, sortDir = state.dashSortDir;
+  var sortedRows = baseRows.sort(function (a, b) {
+    var av, bv;
+    if (sortKey === "ts") { av = a.ts; bv = b.ts; }
+    else if (sortKey === "flag") { av = isRepeatDomain(a) ? 1 : 0; bv = isRepeatDomain(b) ? 1 : 0; }
+    else { av = (a[sortKey] || "").toString().toLowerCase(); bv = (b[sortKey] || "").toString().toLowerCase(); }
+    if (av < bv) return -1;
+    if (av > bv) return 1;
+    return 0;
+  });
+  if (sortDir === "desc") sortedRows.reverse();
+
+  var showFull = state.dashShowAll || searching;
+  var displayRows = showFull ? sortedRows : sortedRows.slice(0, 6);
 
   var html = '';
   html += '<div class="dash-header">';
@@ -1340,21 +1418,37 @@ function renderDash() {
   html +=   '</div>';
   html += '</div>';
 
+  var dashSubText = searching
+    ? sortedRows.length + " hasil untuk &ldquo;" + esc(state.dashSearch.trim()) + "&rdquo;"
+    : (state.dashShowAll ? "Menampilkan seluruh " + rows.length + " pendaftar" : "Sinkron dengan baris terakhir di spreadsheet");
+
   html += '<div class="panel">';
   html +=   '<div class="panel-pad" style="padding-bottom:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;">';
-  html +=     '<div><div class="panel-title">Pendaftar Terbaru</div><div class="panel-sub" style="margin-bottom:0;">' + (state.dashShowAll ? "Menampilkan seluruh " + rows.length + " pendaftar" : "Sinkron dengan baris terakhir di spreadsheet") + '</div></div>';
-  html +=     '<button class="sheet-link" onclick="toggleDashShowAll()">' + (state.dashShowAll ? "Tampilkan lebih sedikit" : "Tampilkan semua pendaftar") + '</button>';
+  html +=     '<div><div class="panel-title">Pendaftar Terbaru</div><div class="panel-sub" style="margin-bottom:0;">' + dashSubText + '</div></div>';
+  html +=     '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
+  html +=       '<div class="dash-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.35-4.35"/></svg>' +
+    '<input id="dash-search" placeholder="Cari nama, perusahaan, email, domain, kode…" value="' + esc(state.dashSearch) + '" oninput="dashSetSearch(this.value)">' +
+    (state.dashSearch ? '<button class="dash-search-clear" onclick="dashClearSearch()" aria-label="Hapus pencarian">&times;</button>' : '') +
+    '</div>';
+  if (!searching) {
+    html +=     '<button class="sheet-link" onclick="toggleDashShowAll()">' + (state.dashShowAll ? "Tampilkan lebih sedikit" : "Tampilkan semua pendaftar") + '</button>';
+  }
+  html +=     '</div>';
   html +=   '</div>';
   if (!displayRows.length) {
-    html += '<div class="empty-note">Belum ada pendaftar.</div>';
-  } else if (state.dashShowAll) {
-    html += '<div class="table-scroll"><table class="registrants registrants-full"><thead><tr><th>Kode</th><th>Nama</th><th>Perusahaan</th><th>Email</th><th>Domain</th><th>Flag</th><th>Timestamp</th></tr></thead><tbody>';
+    html += '<div class="empty-note">' + (searching ? "Tidak ada pendaftar yang cocok." : "Belum ada pendaftar.") + '</div>';
+  } else if (showFull) {
+    html += '<div class="table-scroll"><table class="registrants registrants-full"><thead><tr>' +
+      sortTh("kode", "Kode") + sortTh("nama", "Nama") + sortTh("perusahaan", "Perusahaan") + sortTh("email", "Email") +
+      sortTh("domain", "Domain") + sortTh("flag", "Flag") + sortTh("ts", "Timestamp") + '</tr></thead><tbody>';
     displayRows.forEach(function (r) {
       html += '<tr><td class="tdomain">' + esc(r.kode || "&mdash;") + '</td><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tcompany">' + esc(r.email) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td>' + (isRepeatDomain(r) ? '<span class="flag-pill">Domain Berulang</span>' : '') + '</td><td class="tdate">' + fmtDateTime(r.ts) + '</td></tr>';
     });
     html += '</tbody></table></div>';
   } else {
-    html += '<div class="table-scroll"><table class="registrants"><thead><tr><th>Nama</th><th>Perusahaan</th><th>Domain</th><th>Flag</th><th>Tanggal</th></tr></thead><tbody>';
+    html += '<div class="table-scroll"><table class="registrants"><thead><tr>' +
+      sortTh("nama", "Nama") + sortTh("perusahaan", "Perusahaan") + sortTh("domain", "Domain") + sortTh("flag", "Flag") + sortTh("ts", "Tanggal") +
+      '</tr></thead><tbody>';
     displayRows.forEach(function (r) {
       html += '<tr><td class="tname">' + esc(r.nama) + '</td><td class="tcompany">' + esc(r.perusahaan) + '</td><td class="tdomain">' + esc(r.domain) + '</td><td>' + (isRepeatDomain(r) ? '<span class="flag-pill">Domain Berulang</span>' : '') + '</td><td class="tdate">' + fmtDate(r.ts) + '</td></tr>';
     });
@@ -1363,6 +1457,11 @@ function renderDash() {
   html += '</div>';
 
   el.innerHTML = html;
+
+  if (searchFocused) {
+    var ns = document.getElementById("dash-search");
+    if (ns) { ns.focus(); ns.setSelectionRange(searchSel[0], searchSel[1]); }
+  }
 }
 
 renderForm();
