@@ -67,7 +67,7 @@
   .center { display: flex; flex-direction: column; align-items: center; }
 
   .split-grid {
-    display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 44px; align-items: center;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center;
     margin-top: 20px;
   }
   @media (max-width: 860px) {
@@ -78,11 +78,11 @@
 
   .qr-card {
     background: #fff; border: 1px solid var(--xc-border); border-radius: 16px;
-    box-shadow: 0 4px 28px rgba(11,45,126,0.12); overflow: hidden; width: 100%; max-width: 320px;
+    box-shadow: 0 4px 28px rgba(11,45,126,0.12); overflow: hidden; width: 100%; max-width: 440px;
   }
   .qr-card .gradient-bar { height: 4px; }
-  .qr-card-body { padding: 26px 26px 22px; display: flex; flex-direction: column; align-items: center; }
-  .qr-card img { width: 100%; max-width: 220px; height: auto; display: block; border-radius: 8px; }
+  .qr-card-body { padding: 32px 32px 28px; display: flex; flex-direction: column; align-items: center; }
+  .qr-card img { width: 100%; max-width: 340px; height: auto; display: block; border-radius: 8px; }
   .qr-caption {
     margin-top: 16px; font-size: 10.5px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
     color: var(--xc-text-muted); text-align: center;
@@ -106,14 +106,16 @@
   .card-partner img { height: 18px; display: block; }
   .card-partner-square { height: 24px !important; }
 
-  .video-col { display: flex; flex-direction: column; }
+  .video-col { display: flex; flex-direction: column; align-items: center; }
   .video-title { font-size: 18px; font-weight: 800; text-align: center; margin: 0 0 6px; }
   .video-sub { font-size: 12.5px; color: var(--xc-text-muted); text-align: center; margin: 0 0 20px; }
   .video-frame {
-    width: 100%; border-radius: 14px; overflow: hidden; background: #000;
+    width: 100%; max-width: 504px; border-radius: 14px; overflow: hidden; background: #fff;
     box-shadow: 0 4px 28px rgba(11,45,126,0.14); border: 1px solid var(--xc-border);
+    display: flex; justify-content: center;
   }
   .video-frame video { width: 100%; height: auto; display: block; }
+  .video-frame iframe { width: 100%; max-width: 504px; height: 550px; display: block; border: none; }
 
   .footer { border-top: 1px solid var(--xc-border); padding: 22px 24px; background: #fff; margin-top: 56px; }
   .footer-inner {
@@ -143,10 +145,7 @@
       <div class="video-title">Kenali Xecura Pentest AI</div>
       <div class="video-sub">Powered by RED ORYX &middot; Ringkasan singkat layanan cybersecurity Xecura</div>
       <div class="video-frame">
-        <video controls preload="metadata" playsinline>
-          <source src="../video/xecura-explainer.mp4" type="video/mp4">
-          Browser Anda tidak mendukung pemutaran video.
-        </video>
+        <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7475381693974237184?collapsed=1" height="550" width="504" frameborder="0" allowfullscreen title="Embedded post"></iframe>
       </div>
     </div>
 
