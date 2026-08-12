@@ -625,6 +625,19 @@ function normalizeSheetStatus(raw) {
   return LIVE_STATUS_ALIASES[key] || null;
 }
 
+var LIVE_REAL_FINDINGS = {
+  "GMU-730647943": { critical: 8, high: 0, medium: 0, low: 1, darkwebCreds: 2, lostEstimation: 80000 },
+  "GMU-264785": { critical: 3, high: 0, medium: 2, low: 1, darkwebCreds: 1, lostEstimation: 32000 },
+  "GMU-497480574": { critical: 0, high: 0, medium: 2, low: 1, darkwebCreds: 1, lostEstimation: 2000 },
+  "GMU-065191521": { critical: 1, high: 0, medium: 0, low: 1, darkwebCreds: 1, lostEstimation: 10000 },
+  "GMU-076076729": { critical: 4, high: 0, medium: 4, low: 1, darkwebCreds: 1, lostEstimation: 44000 },
+  "GMU-340799032": { critical: 6, high: 0, medium: 1, low: 0, darkwebCreds: 1, lostEstimation: 61000 },
+  "GMU-666868394": { critical: 24, high: 0, medium: 27, low: 1, darkwebCreds: 1, lostEstimation: 267000 },
+  "GMU-040413690": { critical: 20, high: 0, medium: 0, low: 1, darkwebCreds: 1, lostEstimation: 200000 },
+  "GMU-458166": { critical: 4, high: 0, medium: 1, low: 1, darkwebCreds: 2, lostEstimation: 41000 },
+  "GMU-530190": { critical: 2, high: 0, medium: 3, low: 1, darkwebCreds: 1, lostEstimation: 23000 }
+};
+
 var state = {
   view: "form",
   nama: "", perusahaan: "", email: "", domain: "",
@@ -934,6 +947,14 @@ function renderLive() {
     var stats = liveStatsForKode(r.kode || r.perusahaan);
     var realStatus = normalizeSheetStatus(r.status);
     if (realStatus) stats.status = realStatus;
+    var real = LIVE_REAL_FINDINGS[r.kode];
+    if (real) {
+      stats.critical = real.critical; stats.high = real.high; stats.medium = real.medium; stats.low = real.low;
+      stats.total = real.critical + real.high + real.medium + real.low;
+      stats.darkwebCreds = real.darkwebCreds;
+      stats.lostEstimation = real.lostEstimation;
+      stats.risk = Math.min(100, Math.round(real.critical * 18 + real.high * 9 + real.medium * 3 + real.low * 1));
+    }
     return { row: r, stats: stats };
   });
 
@@ -1052,7 +1073,7 @@ function renderLive() {
   if (!perCompany.length) {
     html += '<div class="empty-note" style="color:var(--live-text-muted);padding:0 24px 24px;">Belum ada engagement aktif.</div>';
   } else {
-    html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Status</th><th>Findings</th><th>Risk</th><th>Kredensial Bocor</th></tr></thead><tbody>';
+    html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Status</th><th>Findings</th><th>Risk</th><th>Kredensial Bocor</th><th>Estimasi Kerugian</th></tr></thead><tbody>';
     perCompany.slice().sort(function (a, b) {
       return LIVE_STATUS_ORDER[a.stats.status] - LIVE_STATUS_ORDER[b.stats.status] || b.stats.risk - a.stats.risk;
     }).forEach(function (c) {
@@ -1070,6 +1091,7 @@ function renderLive() {
       html += '</div></td>';
       html += '<td class="ltrisk" style="color:' + riskColor + ';">' + s.risk + '</td>';
       html += '<td style="color:' + dwColor + ';font-weight:600;">' + (s.darkwebCreds > 0 ? s.darkwebCreds : "&mdash;") + '</td>';
+      html += '<td style="color:#F03C3C;font-weight:600;">' + (s.lostEstimation ? "$" + s.lostEstimation.toLocaleString("en-US") + "+" : "&mdash;") + '</td>';
       html += '</tr>';
     });
     html += '</tbody></table></div>';
