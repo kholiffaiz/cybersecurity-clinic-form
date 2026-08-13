@@ -956,9 +956,15 @@ function renderLiveDetailRow(c) {
 
   html += '<div class="live-detail-col">';
   html += '<div class="live-detail-title" style="color:#F03C3C;">Ringkasan Dark Web Monitoring</div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Kredensial bocor ditemukan</span><span class="live-detail-value" style="color:#F03C3C;">' + (s.darkwebCreds || 0) + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Total kredensial bocor</span><span class="live-detail-value" style="color:#F03C3C;">' + (s.darkwebCreds || 0) + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Critical</span><span class="live-detail-value" style="color:' + SEV_COLORS.critical + ';">' + s.critical + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value" style="color:' + SEV_COLORS.high + ';">' + s.high + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value" style="color:' + SEV_COLORS.medium + ';">' + s.medium + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value" style="color:' + SEV_COLORS.low + ';">' + s.low + '</span></div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Domain dipantau</span><span class="live-detail-value">' + esc(r.domain || "&mdash;") + '</span></div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Status pemantauan</span><span class="live-detail-value">' + (s.darkwebCreds > 0 ? "Kredensial ditemukan" : "Tidak ada temuan") + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Tingkat risiko tertinggi</span><span class="live-detail-value" style="color:' + riskColor + ';">' + riskLabel + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Estimasi kerugian</span><span class="live-detail-value" style="color:#F03C3C;">' + (s.lostEstimation != null ? "$" + s.lostEstimation.toLocaleString("en-US") + "+" : "&mdash;") + '</span></div>';
   html += '<div class="live-detail-note">' + (s.darkwebCreds > 0
     ? 'Ditemukan ' + s.darkwebCreds + ' kredensial (email/password) terkait domain ini yang bocor di forum &amp; marketplace dark web. Disarankan segera reset kredensial dan aktifkan MFA pada akun terkait.'
     : 'Belum ditemukan kebocoran kredensial terkait domain ini pada pemindaian terakhir.') + '</div>';
@@ -966,13 +972,11 @@ function renderLiveDetailRow(c) {
 
   html += '<div class="live-detail-col">';
   html += '<div class="live-detail-title" style="color:#00D4E8;">Ringkasan Hasil Pentest</div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Total temuan</span><span class="live-detail-value">' + s.total + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Critical</span><span class="live-detail-value" style="color:' + SEV_COLORS.critical + ';">' + s.critical + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value" style="color:' + SEV_COLORS.high + ';">' + s.high + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value" style="color:' + SEV_COLORS.medium + ';">' + s.medium + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value" style="color:' + SEV_COLORS.low + ';">' + s.low + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Tingkat risiko tertinggi</span><span class="live-detail-value" style="color:' + riskColor + ';">' + riskLabel + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Estimasi kerugian</span><span class="live-detail-value" style="color:#F03C3C;">' + (s.lostEstimation != null ? "$" + s.lostEstimation.toLocaleString("en-US") + "+" : "&mdash;") + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Critical</span><span class="live-detail-value">&mdash;</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value">&mdash;</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value">&mdash;</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value">&mdash;</span></div>';
+  html += '<div class="live-detail-note">Hasil pentest belum tersedia untuk engagement ini &mdash; data akan diperbarui setelah pengujian selesai.</div>';
   html += '</div>';
 
   html += '</div></td></tr>';
