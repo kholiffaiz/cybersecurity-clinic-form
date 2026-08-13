@@ -383,8 +383,7 @@
     font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--live-text-muted);
     margin: 0 0 10px 2px;
   }
-  .live-subheader { font-size: 18px; font-weight: 800; margin: 30px 0 14px; letter-spacing: -0.3px; color: var(--live-text-strong); }
-  @media (max-width: 600px) { .live-subheader { font-size: 16px; } }
+  .live-subheader { margin: 30px 0 14px; }
   .live-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 14px; }
   .live-stat-grid-5 { grid-template-columns: repeat(5,1fr); }
   .live-stat-grid-3 { grid-template-columns: repeat(3,1fr); }
@@ -1397,7 +1396,7 @@ function renderLive() {
   html += '<div class="live-panel live-stat-tile" style="animation-delay:.38s;"><div class="live-stat-head"><div class="live-stat-label">Low</div>' + statIcon('shield', SEV_COLORS.low) + '</div><div class="live-stat-value" id="cu-low" style="color:' + SEV_COLORS.low + ';">0</div><div class="live-stat-sub">Prioritas rendah</div></div>';
   html += '</div>';
 
-  html += '<div class="live-subheader">Xecura Darkweb Monitoring AI &middot; Powered by CLANDESTINE PROJECT</div>';
+  html += '<div class="live-h1 live-subheader">Xecura Darkweb Monitoring AI &middot; Powered by CLANDESTINE PROJECT</div>';
   html += '<div class="live-section-label">Dark Web Exposure</div>';
   html += '<div class="live-stat-grid live-stat-grid-3">';
   html += '<div class="live-panel live-stat-tile" style="animation-delay:.4s;"><div class="live-stat-head"><div class="live-stat-label">Kredensial Bocor</div>' + statIcon('key', '#F03C3C') + '</div><div class="live-stat-value" id="cu-dw" style="color:#F03C3C;">0</div><div class="live-stat-sub">Ditemukan di dark web</div></div>';
