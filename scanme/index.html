@@ -42,11 +42,18 @@
 
   .header { background: var(--xc-navy); padding: 0 24px; }
   .header-inner {
-    max-width: 720px; margin: 0 auto; display: flex; align-items: center;
-    min-height: 74px; padding: 12px 0;
+    max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;
+    min-height: 74px; gap: 14px; flex-wrap: wrap; padding: 12px 0;
   }
   .brand img { height: 26px; display: block; }
   .gradient-bar { height: 4px; background: var(--xc-gradient); }
+
+  .tabs { display: flex; gap: 6px; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 100px; }
+  .tab-btn {
+    border: none; border-radius: 100px; padding: 9px 20px; font-size: 12.5px; font-weight: 700;
+    cursor: pointer; transition: all .15s; background: transparent; color: rgba(255,255,255,0.7);
+  }
+  .tab-btn.active { background: #fff; color: var(--xc-navy); }
 
   .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 64px; }
   @media (max-width: 600px) { .wrap { padding: 32px 16px 48px; } }
@@ -142,6 +149,12 @@
 <div class="header">
   <div class="header-inner">
     <a class="brand" href="/"><img src="../assets/logo-xecura-horizontal-white.png" alt="Xecura"></a>
+    <div class="tabs">
+      <a class="tab-btn" href="/">Formulir</a>
+      <a class="tab-btn active" href="/scanme/">QR Code</a>
+      <a class="tab-btn" href="/#dash">Dashboard</a>
+      <a class="tab-btn" href="/#live">Live</a>
+    </div>
   </div>
 </div>
 <div class="gradient-bar"></div>

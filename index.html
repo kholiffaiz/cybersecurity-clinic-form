@@ -1962,7 +1962,8 @@ function renderDash() {
 }
 
 renderForm();
-showView("form");
+var initialView = (location.hash === "#dash" || location.hash === "#live") ? location.hash.slice(1) : "form";
+showView(initialView);
 </script>
 </body>
 </html>
