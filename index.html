@@ -481,6 +481,7 @@
   table.live-table td.ltcode { color: #00D4E8; font-weight: 700; font-family: ui-monospace, monospace; font-size: 11.5px; }
   .live-wrap.live-light table.live-table td.ltcode { color: #0B1226; }
   table.live-table td.ltcompany { color: var(--live-text-strong); font-weight: 700; }
+  .live-company-mask { color: var(--live-text-muted); letter-spacing: 2px; user-select: none; }
   table.live-table td.ltrisk { font-weight: 800; font-variant-numeric: tabular-nums; }
 
   .live-status-pill { display: inline-block; padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px; }
@@ -757,6 +758,7 @@ var state = {
   liveAuthed: false, livePassword: "", liveRows: [], liveLoading: false, liveLoadError: false,
   livePwError: "", liveChecking: false,
   liveTheme: (function () { try { return localStorage.getItem("xc_live_theme") === "light" ? "light" : "dark"; } catch (e) { return "dark"; } })(),
+  liveShowCompany: (function () { try { return localStorage.getItem("xc_live_show_company") === "1"; } catch (e) { return false; } })(),
   liveExpandedKode: null,
   liveSearch: ""
 };
@@ -786,6 +788,11 @@ function genKode() {
     n = Math.floor(Math.random() * 1000000000);
   }
   return "GMU-" + String(n).padStart(9, "0");
+}
+
+function companyDisplay(name) {
+  if (state.liveShowCompany) return esc(name || "&mdash;");
+  return '<span class="live-company-mask">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span>';
 }
 
 function esc(s) {
@@ -1028,7 +1035,7 @@ function renderLiveDetailRow(c) {
   var dwColor = dwSev ? SEV_COLORS[dwSev] : "#4ADE80";
   var html = '<tr class="live-detail-tr"><td class="live-detail-td" colspan="7">';
   html += '<div class="live-detail-outer">';
-  html += '<div class="live-detail-header"><span class="live-detail-company-name">' + esc(r.perusahaan || "&mdash;") + '</span><span class="live-detail-company-domain">' + esc(r.domain || "&mdash;") + '</span></div>';
+  html += '<div class="live-detail-header"><span class="live-detail-company-name">' + companyDisplay(r.perusahaan) + '</span><span class="live-detail-company-domain">' + esc(r.domain || "&mdash;") + '</span></div>';
   html += '<div class="live-detail-wrap">';
 
   html += '<div class="live-detail-col">';
@@ -1092,6 +1099,23 @@ function themeToggleBtn() {
   var label = state.liveTheme === "light" ? "Ganti ke dark mode" : "Ganti ke light mode";
   return '<button class="live-theme-btn" onclick="toggleLiveTheme()" title="' + label + '" aria-label="' + label + '">' +
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + LIVE_THEME_ICONS[icon] + '</svg></button>';
+}
+
+function toggleLiveCompanyVisibility() {
+  state.liveShowCompany = !state.liveShowCompany;
+  try { localStorage.setItem("xc_live_show_company", state.liveShowCompany ? "1" : "0"); } catch (e) {}
+  renderLive();
+}
+
+var LIVE_EYE_ICONS = {
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 5.24A10.4 10.4 0 0 1 12 5c6.5 0 10 7 10 7a17.7 17.7 0 0 1-3.15 4.2M6.5 6.53C3.8 8.32 2 12 2 12s3.5 7 10 7c1.4 0 2.68-.32 3.83-.83"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>'
+};
+function companyVisibilityBtn() {
+  var icon = state.liveShowCompany ? "eyeOff" : "eye";
+  var label = state.liveShowCompany ? "Sembunyikan nama perusahaan" : "Tampilkan nama perusahaan";
+  return '<button class="live-theme-btn" onclick="toggleLiveCompanyVisibility()" title="' + label + '" aria-label="' + label + '">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + LIVE_EYE_ICONS[icon] + '</svg></button>';
 }
 
 function countUp(el, target, duration) {
@@ -1267,10 +1291,13 @@ function renderLive() {
   html += '<div class="live-panel" style="animation-delay:.5s;">';
   html += '<div class="live-panel-pad" style="padding-bottom:10px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;">';
   html += '<div><div class="live-panel-title">Engagement Aktif</div><div class="live-panel-sub" style="margin-bottom:0;">' + (liveSearching ? liveFilteredCompany.length + ' hasil untuk &ldquo;' + esc(state.liveSearch.trim()) + '&rdquo;' : 'Berdasarkan kode registrasi Cybersecurity Clinic') + '</div></div>';
+  html += '<div style="display:flex;align-items:center;gap:10px;">';
+  html += companyVisibilityBtn();
   html += '<div class="live-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.35-4.35"/></svg>' +
     '<input id="live-search" placeholder="Cari kode, perusahaan, domain…" value="' + esc(state.liveSearch) + '" oninput="liveSetSearch(this.value)">' +
     (state.liveSearch ? '<button class="live-search-clear" onclick="liveClearSearch()" aria-label="Hapus pencarian">&times;</button>' : '') +
     '</div>';
+  html += '</div>';
   html += '</div>';
   if (!perCompany.length) {
     html += '<div class="empty-note" style="color:var(--live-text-muted);padding:0 24px 24px;">Belum ada engagement aktif.</div>';
@@ -1292,7 +1319,7 @@ function renderLive() {
       var isExpanded = kode && state.liveExpandedKode === kode;
       html += '<tr class="live-row-clickable' + (isExpanded ? ' live-row-expanded' : '') + '" onclick="toggleLiveDetail(\'' + kode + '\')">';
       html += '<td class="ltcode">' + esc(kode || "&mdash;") + (kode ? '<span class="live-row-chevron">&#9656;</span>' : '') + '</td>';
-      html += '<td class="ltcompany">' + esc(c.row.perusahaan || "&mdash;") + '</td>';
+      html += '<td class="ltcompany">' + companyDisplay(c.row.perusahaan) + '</td>';
       html += '<td><span class="live-status-pill live-status-' + s.status + '">' + LIVE_STATUS_LABELS[s.status] + '</span>' + (isLiveActive(s.status) ? '<span class="ai-spin"></span>' : '') + '</td>';
       html += '<td><div class="live-mini-bar">';
       ["critical", "high", "medium", "low"].forEach(function (k) {
