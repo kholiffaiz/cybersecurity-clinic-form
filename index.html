@@ -502,10 +502,14 @@
   tr.live-row-expanded .live-row-chevron { transform: rotate(90deg); color: #00D4E8; }
 
   .live-detail-td { padding: 0 !important; border-bottom: 1px solid var(--live-row-border); }
-  .live-detail-wrap {
-    padding: 18px 24px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
-    animation: fadeInUp .3s ease both;
+  .live-detail-outer { padding: 18px 24px 22px; animation: fadeInUp .3s ease both; }
+  .live-detail-header {
+    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--live-panel-border);
   }
+  .live-detail-company-name { font-size: 14.5px; font-weight: 800; color: var(--live-text-strong); }
+  .live-detail-company-domain { font-size: 12px; color: var(--live-text-muted); font-family: ui-monospace, monospace; }
+  .live-detail-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   @media (max-width: 700px) { .live-detail-wrap { grid-template-columns: 1fr; } }
   .live-detail-col { background: var(--live-panel-bg); border: 1px solid var(--live-panel-border); border-radius: 10px; padding: 16px 18px; }
   .live-detail-title { font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 12px; }
@@ -964,6 +968,8 @@ function renderLiveDetailRow(c) {
   var riskLabel = riskSev ? SEV_LABELS[riskSev] : "Tidak ada temuan";
   var riskColor = riskSev ? SEV_COLORS[riskSev] : "#4ADE80";
   var html = '<tr class="live-detail-tr"><td class="live-detail-td" colspan="6">';
+  html += '<div class="live-detail-outer">';
+  html += '<div class="live-detail-header"><span class="live-detail-company-name">' + esc(r.perusahaan || "&mdash;") + '</span><span class="live-detail-company-domain">' + esc(r.domain || "&mdash;") + '</span></div>';
   html += '<div class="live-detail-wrap">';
 
   html += '<div class="live-detail-col">';
@@ -973,7 +979,6 @@ function renderLiveDetailRow(c) {
   html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value" style="color:' + SEV_COLORS.high + ';">' + s.high + '</span></div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value" style="color:' + SEV_COLORS.medium + ';">' + s.medium + '</span></div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value" style="color:' + SEV_COLORS.low + ';">' + s.low + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Domain dipantau</span><span class="live-detail-value">' + esc(r.domain || "&mdash;") + '</span></div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Status pemantauan</span><span class="live-detail-value">' + (s.darkwebCreds > 0 ? "Kredensial ditemukan" : "Tidak ada temuan") + '</span></div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Tingkat risiko tertinggi</span><span class="live-detail-value" style="color:' + riskColor + ';">' + riskLabel + '</span></div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Estimasi kerugian</span><span class="live-detail-value" style="color:#F03C3C;">' + (s.lostEstimation != null ? "$" + s.lostEstimation.toLocaleString("en-US") + "+" : "&mdash;") + '</span></div>';
@@ -991,7 +996,7 @@ function renderLiveDetailRow(c) {
   html += '<div class="live-detail-note">Hasil pentest belum tersedia untuk engagement ini &mdash; data akan diperbarui setelah pengujian selesai.</div>';
   html += '</div>';
 
-  html += '</div></td></tr>';
+  html += '</div></div></td></tr>';
   return html;
 }
 
