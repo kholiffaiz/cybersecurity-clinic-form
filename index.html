@@ -1026,7 +1026,7 @@ function renderLiveDetailRow(c) {
   var dwSev = topSeverity(dw);
   var dwLabel = dwSev ? SEV_LABELS[dwSev] : "Tidak ada temuan";
   var dwColor = dwSev ? SEV_COLORS[dwSev] : "#4ADE80";
-  var html = '<tr class="live-detail-tr"><td class="live-detail-td" colspan="6">';
+  var html = '<tr class="live-detail-tr"><td class="live-detail-td" colspan="7">';
   html += '<div class="live-detail-outer">';
   html += '<div class="live-detail-header"><span class="live-detail-company-name">' + esc(r.perusahaan || "&mdash;") + '</span><span class="live-detail-company-domain">' + esc(r.domain || "&mdash;") + '</span></div>';
   html += '<div class="live-detail-wrap">';
@@ -1277,7 +1277,7 @@ function renderLive() {
   } else if (!liveFilteredCompany.length) {
     html += '<div class="empty-note" style="color:var(--live-text-muted);padding:0 24px 24px;">Tidak ada engagement yang cocok dengan pencarian.</div>';
   } else {
-    html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Status</th><th>Findings</th><th>Risk</th><th>Kredensial Bocor</th><th>Estimasi Kerugian</th></tr></thead><tbody>';
+    html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Perusahaan</th><th>Status</th><th>Findings</th><th>Risk</th><th>Kredensial Bocor</th><th>Estimasi Kerugian</th></tr></thead><tbody>';
     liveFilteredCompany.slice().sort(function (a, b) {
       var sevA = SEV_ORDER.indexOf(topSeverity(a.stats)); if (sevA < 0) sevA = 99;
       var sevB = SEV_ORDER.indexOf(topSeverity(b.stats)); if (sevB < 0) sevB = 99;
@@ -1292,6 +1292,7 @@ function renderLive() {
       var isExpanded = kode && state.liveExpandedKode === kode;
       html += '<tr class="live-row-clickable' + (isExpanded ? ' live-row-expanded' : '') + '" onclick="toggleLiveDetail(\'' + kode + '\')">';
       html += '<td class="ltcode">' + esc(kode || "&mdash;") + (kode ? '<span class="live-row-chevron">&#9656;</span>' : '') + '</td>';
+      html += '<td class="ltcompany">' + esc(c.row.perusahaan || "&mdash;") + '</td>';
       html += '<td><span class="live-status-pill live-status-' + s.status + '">' + LIVE_STATUS_LABELS[s.status] + '</span>' + (isLiveActive(s.status) ? '<span class="ai-spin"></span>' : '') + '</td>';
       html += '<td><div class="live-mini-bar">';
       ["critical", "high", "medium", "low"].forEach(function (k) {
