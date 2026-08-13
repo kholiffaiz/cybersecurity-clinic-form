@@ -458,10 +458,20 @@
   }
   @keyframes aiSpin { to { transform: rotate(360deg); } }
 
-  .live-cat-row + .live-cat-row { margin-top: 14px; }
-  .live-cat-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--live-cat-head); }
-  .live-cat-track { height: 7px; border-radius: 100px; background: var(--live-track-bg); overflow: hidden; }
-  .live-cat-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #1B52CE, #00D4E8); width: 0; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+  .live-vuln-row {
+    display: flex; align-items: center; gap: 10px; padding: 9px 0;
+    border-bottom: 1px solid var(--live-row-border);
+  }
+  .live-vuln-row:last-child { border-bottom: none; }
+  .live-vuln-badge {
+    flex: none; font-size: 8.5px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 5px;
+  }
+  .live-vuln-badge-critical { background: rgba(240,60,60,0.15); color: #F03C3C; }
+  .live-vuln-badge-high { background: rgba(255,139,61,0.15); color: #FF8B3D; }
+  .live-vuln-score { flex: none; width: 30px; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 13px; }
+  .live-vuln-title { flex: 1; font-size: 12px; color: var(--live-text); line-height: 1.4; }
+  .live-vuln-domain { flex: none; font-size: 10.5px; color: var(--live-text-muted); font-family: ui-monospace, monospace; }
 
   .live-table-scroll { overflow-x: auto; }
   table.live-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 12px; }
@@ -640,10 +650,12 @@ function statIcon(name, color) {
   var inner = STAT_ICONS[name] || STAT_ICONS.target;
   return '<div class="live-stat-icon"' + (color ? ' style="color:' + color + ';"' : '') + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg></div>';
 }
-var LIVE_CATEGORIES = [
-  "Broken Access Control", "Exposed API Keys / Secrets", "Outdated TLS Configuration",
-  "SQL Injection Surface", "Missing Security Headers", "Weak Authentication Policy",
-  "Unpatched Known CVEs", "Open Cloud Storage Bucket"
+var LIVE_TOP_VULNS = [
+  { severity: "critical", score: 10.0, title: "Default admin credentials (admin/admin123) accept…", domain: "ptmatsuo.co.id" },
+  { severity: "critical", score: 10.0, title: "Default admin credentials (admin/admin123) accept…", domain: "ptmatsuo.co.id" },
+  { severity: "critical", score: 9.3, title: "Default admin credentials (admin/admin123) accepte…", domain: "ptmatsuo.co.id" },
+  { severity: "critical", score: 9.1, title: "DNS zone not signed with DNSSEC (DNS spoofin…", domain: "fln.co.id" },
+  { severity: "high", score: 8.8, title: "Unthrottled xmlrpc.php authentication endpoint enables cr…", domain: "fln.co.id" }
 ];
 var LIVE_STATUSES = ["scheduled", "scanning", "analyzing", "ready"];
 var LIVE_STATUS_LABELS = { scheduled: "Scheduled", scanning: "Scanning", analyzing: "Analyzing", ready: "Report Ready" };
@@ -1076,11 +1088,6 @@ function renderLive() {
     ? "conic-gradient(" + conicParts.join(", ") + ")"
     : "conic-gradient(#1F2A47 0% 100%)";
 
-  var catSeed = seededRandom("categories-" + totalFindings);
-  var catData = LIVE_CATEGORIES.map(function (name) {
-    return { name: name, count: Math.round(2 + catSeed() * (6 + totalFindings)) };
-  }).sort(function (a, b) { return b.count - a.count; }).slice(0, 6);
-  var catMax = catData.length ? catData[0].count : 1;
 
   var html = '';
   html += '<div class="' + liveWrapClass() + '"><div class="live-inner">';
@@ -1141,10 +1148,14 @@ function renderLive() {
   html += '</div></div></div>';
 
   html += '<div class="live-panel live-panel-pad" style="animation-delay:.46s;">';
-  html += '<div class="live-panel-title">Top Kategori Kerentanan</div><div class="live-panel-sub">Digabungkan lintas seluruh target</div>';
-  catData.forEach(function (c) {
-    var w = Math.round(c.count / catMax * 100);
-    html += '<div class="live-cat-row"><div class="live-cat-head"><span>' + esc(c.name) + '</span><span style="color:var(--live-text-muted);">' + c.count + '</span></div><div class="live-cat-track"><div class="live-cat-fill" data-w="' + w + '"></div></div></div>';
+  html += '<div class="live-panel-title">Top Kategori Kerentanan</div><div class="live-panel-sub">Temuan tertinggi berdasarkan skor CVSS</div>';
+  LIVE_TOP_VULNS.forEach(function (v) {
+    html += '<div class="live-vuln-row">';
+    html += '<span class="live-vuln-badge live-vuln-badge-' + v.severity + '">' + v.severity + '</span>';
+    html += '<span class="live-vuln-score" style="color:' + SEV_COLORS[v.severity] + ';">' + v.score.toFixed(1) + '</span>';
+    html += '<span class="live-vuln-title">' + esc(v.title) + '</span>';
+    html += '<span class="live-vuln-domain">' + esc(v.domain) + '</span>';
+    html += '</div>';
   });
   html += '</div>';
   html += '</div>';
@@ -1200,12 +1211,6 @@ function renderLive() {
   countUp(document.getElementById("cu-risk"), avgRisk, 900);
   countUp(document.getElementById("cu-dw"), totalDarkweb, 900);
   countUp(document.getElementById("cu-dw-affected"), affectedDarkweb, 900);
-
-  setTimeout(function () {
-    document.querySelectorAll(".live-cat-fill").forEach(function (elx) {
-      elx.style.width = elx.getAttribute("data-w") + "%";
-    });
-  }, 60);
 }
 
 function set(key) {
