@@ -60,11 +60,26 @@
     text-align: center;
   }
   @media (max-width: 600px) { .h1 { font-size: 25px; } }
-  .lead {
-    font-size: 14px; line-height: 1.72; color: var(--xc-text-body); margin: 0 auto 36px;
-    max-width: 480px; text-align: center;
-  }
   .center { display: flex; flex-direction: column; align-items: center; }
+
+  .steps-row {
+    display: flex; align-items: flex-start; justify-content: center;
+    width: 100%; max-width: 560px; margin: 4px 0 36px;
+  }
+  .step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: none; width: 108px; }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%; background: var(--xc-blue); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex: none;
+  }
+  .step-label { font-size: 11.5px; font-weight: 700; color: var(--xc-text); text-align: center; line-height: 1.35; }
+  .step-connector { flex: 1; height: 2px; background: var(--xc-border); margin-top: 15px; min-width: 16px; }
+  @media (max-width: 600px) {
+    .steps-row { max-width: 100%; }
+    .step-item { width: 84px; }
+    .step-num { width: 26px; height: 26px; font-size: 12px; }
+    .step-label { font-size: 10.5px; }
+    .step-connector { margin-top: 13px; }
+  }
 
   .split-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: start;
@@ -135,7 +150,13 @@
   <div class="center">
     <span class="eyebrow">Pendaftaran Peserta</span>
     <h1 class="h1">Daftarkan organisasi Anda untuk sesi Cybersecurity Clinic</h1>
-    <p class="lead">Pindai kode QR di samping dengan kamera ponsel Anda, atau buka tautan formulir untuk mendaftarkan organisasi Anda dalam beberapa langkah singkat.</p>
+    <div class="steps-row">
+      <div class="step-item"><div class="step-num">1</div><div class="step-label">Isi Formulir</div></div>
+      <div class="step-connector"></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-label">Verifikasi Domain</div></div>
+      <div class="step-connector"></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-label">Jadwal Sesi Dikirim</div></div>
+    </div>
   </div>
 
   <div class="split-grid">

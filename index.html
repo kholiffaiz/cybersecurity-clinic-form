@@ -503,7 +503,8 @@
   tr.live-row-expanded .live-row-chevron { transform: rotate(90deg); color: #00D4E8; }
 
   .live-detail-td { padding: 0 !important; border-bottom: 1px solid var(--live-row-border); }
-  .live-detail-outer { padding: 18px 24px 22px; animation: fadeInUp .3s ease both; }
+  .live-detail-outer { padding: 18px 24px 22px; animation: fadeInUp .3s ease both; transition: opacity .18s ease; }
+  .live-detail-closing .live-detail-outer { animation: none; opacity: 0; }
   .live-detail-header {
     display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
     margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--live-panel-border);
@@ -1044,8 +1045,39 @@ function isLiveActive(status) {
 }
 
 function toggleLiveDetail(kode) {
-  state.liveExpandedKode = state.liveExpandedKode === kode ? null : kode;
-  renderLive();
+  var tbody = document.querySelector(".live-table tbody");
+  if (!tbody) {
+    state.liveExpandedKode = state.liveExpandedKode === kode ? null : kode;
+    renderLive();
+    return;
+  }
+
+  var prevKode = state.liveExpandedKode;
+
+  if (prevKode) {
+    var prevRow = tbody.querySelector('tr.live-row-clickable[data-kode="' + prevKode + '"]');
+    if (prevRow) prevRow.classList.remove("live-row-expanded");
+    var prevDetail = tbody.querySelector('tr.live-detail-tr[data-kode-for="' + prevKode + '"]');
+    if (prevDetail) {
+      prevDetail.classList.add("live-detail-closing");
+      setTimeout(function () { if (prevDetail.parentNode) prevDetail.remove(); }, 180);
+    }
+  }
+
+  if (prevKode === kode) {
+    state.liveExpandedKode = null;
+    return;
+  }
+
+  state.liveExpandedKode = kode;
+  var row = (state.liveRows || []).find(function (r) { return r.kode === kode; });
+  var clickedRow = tbody.querySelector('tr.live-row-clickable[data-kode="' + kode + '"]');
+  if (!row || !clickedRow) {
+    renderLive();
+    return;
+  }
+  clickedRow.classList.add("live-row-expanded");
+  clickedRow.insertAdjacentHTML("afterend", renderLiveDetailRow(computeCompanyStats(row)));
 }
 
 function liveSetSearch(v) {
@@ -1148,7 +1180,7 @@ function renderLiveDetailRow(c) {
   var dwSev = topSeverity(dw);
   var dwLabel = dwSev ? SEV_LABELS[dwSev] : "Tidak ada temuan";
   var dwColor = dwSev ? SEV_COLORS[dwSev] : "#4ADE80";
-  var html = '<tr class="live-detail-tr"><td class="live-detail-td" colspan="7">';
+  var html = '<tr class="live-detail-tr" data-kode-for="' + esc(r.kode || "") + '"><td class="live-detail-td" colspan="7">';
   html += '<div class="live-detail-outer">';
   html += '<div class="live-detail-header"><span class="live-detail-company-name">' + companyDisplay(r.perusahaan) + '</span><span class="live-detail-company-domain">' + esc(r.domain || "&mdash;") + '</span></div>';
   html += '<div class="live-detail-wrap">';
@@ -1249,6 +1281,35 @@ function countUp(el, target, duration) {
   requestAnimationFrame(step);
 }
 
+function computeCompanyStats(r) {
+  var stats = liveStatsForKode(r.kode || r.perusahaan);
+  var realStatus = normalizeSheetStatus(r.status);
+  if (realStatus) stats.status = realStatus;
+
+  var real = LIVE_REAL_FINDINGS[r.kode];
+  var darkweb = real
+    ? { critical: real.critical, high: real.high, medium: real.medium, low: real.low }
+    : { critical: stats.critical, high: stats.high, medium: stats.medium, low: stats.low };
+  if (real) {
+    stats.darkwebCreds = real.critical + real.high + real.medium + real.low;
+    stats.lostEstimation = real.lostEstimation;
+  }
+
+  var pt = LIVE_PENTEST_RESULTS[r.kode];
+  var pentest = pt ? { critical: pt.critical, high: pt.high, medium: pt.medium, low: pt.low } : null;
+
+  stats.critical = darkweb.critical + (pentest ? pentest.critical : 0);
+  stats.high = darkweb.high + (pentest ? pentest.high : 0);
+  stats.medium = darkweb.medium + (pentest ? pentest.medium : 0);
+  stats.low = darkweb.low + (pentest ? pentest.low : 0);
+  stats.total = stats.critical + stats.high + stats.medium + stats.low;
+  stats.risk = Math.min(100, Math.round(stats.critical * 18 + stats.high * 9 + stats.medium * 3 + stats.low * 1));
+  stats.darkweb = darkweb;
+  stats.pentest = pentest;
+
+  return { row: r, stats: stats };
+}
+
 function renderLive() {
   var el = document.getElementById("view-live");
   var rows = state.liveRows || [];
@@ -1261,34 +1322,7 @@ function renderLive() {
     return;
   }
 
-  var perCompany = rows.map(function (r) {
-    var stats = liveStatsForKode(r.kode || r.perusahaan);
-    var realStatus = normalizeSheetStatus(r.status);
-    if (realStatus) stats.status = realStatus;
-
-    var real = LIVE_REAL_FINDINGS[r.kode];
-    var darkweb = real
-      ? { critical: real.critical, high: real.high, medium: real.medium, low: real.low }
-      : { critical: stats.critical, high: stats.high, medium: stats.medium, low: stats.low };
-    if (real) {
-      stats.darkwebCreds = real.critical + real.high + real.medium + real.low;
-      stats.lostEstimation = real.lostEstimation;
-    }
-
-    var pt = LIVE_PENTEST_RESULTS[r.kode];
-    var pentest = pt ? { critical: pt.critical, high: pt.high, medium: pt.medium, low: pt.low } : null;
-
-    stats.critical = darkweb.critical + (pentest ? pentest.critical : 0);
-    stats.high = darkweb.high + (pentest ? pentest.high : 0);
-    stats.medium = darkweb.medium + (pentest ? pentest.medium : 0);
-    stats.low = darkweb.low + (pentest ? pentest.low : 0);
-    stats.total = stats.critical + stats.high + stats.medium + stats.low;
-    stats.risk = Math.min(100, Math.round(stats.critical * 18 + stats.high * 9 + stats.medium * 3 + stats.low * 1));
-    stats.darkweb = darkweb;
-    stats.pentest = pentest;
-
-    return { row: r, stats: stats };
-  });
+  var perCompany = rows.map(computeCompanyStats);
 
   var totalEngagements = perCompany.length;
   var totalTargets = perCompany.reduce(function (a, c) { return a + c.stats.targets; }, 0);
@@ -1434,7 +1468,7 @@ function renderLive() {
       var dwColor = s.darkwebCreds >= 50 ? SEV_COLORS.critical : s.darkwebCreds >= 10 ? SEV_COLORS.high : s.darkwebCreds > 0 ? "#F5B93B" : "#6E7C99";
       var kode = c.row.kode || "";
       var isExpanded = kode && state.liveExpandedKode === kode;
-      html += '<tr class="live-row-clickable' + (isExpanded ? ' live-row-expanded' : '') + '" onclick="toggleLiveDetail(\'' + kode + '\')">';
+      html += '<tr class="live-row-clickable' + (isExpanded ? ' live-row-expanded' : '') + '" data-kode="' + esc(kode) + '" onclick="toggleLiveDetail(\'' + kode + '\')">';
       html += '<td class="ltcode">' + esc(kode || "&mdash;") + (kode ? '<span class="live-row-chevron">&#9656;</span>' : '') + '</td>';
       html += '<td class="ltcompany">' + companyDisplay(c.row.perusahaan) + '</td>';
       html += '<td><span class="live-status-pill live-status-' + s.status + '">' + LIVE_STATUS_LABELS[s.status] + '</span>' + (isLiveActive(s.status) ? '<span class="ai-spin"></span>' : '') + '</td>';
