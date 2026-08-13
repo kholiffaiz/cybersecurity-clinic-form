@@ -522,6 +522,24 @@
   .live-detail-value { font-weight: 700; }
   .live-detail-note { font-size: 11.5px; color: var(--live-text-muted); line-height: 1.65; margin-top: 12px; }
 
+  .live-search-wrap { position: relative; width: 100%; max-width: 260px; }
+  .live-search-wrap svg {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px;
+    color: var(--live-text-muted); pointer-events: none;
+  }
+  .live-search-wrap input {
+    width: 100%; box-sizing: border-box; padding: 9px 30px 9px 32px; border: 1px solid var(--live-panel-border); border-radius: 8px;
+    font-family: inherit; font-size: 12.5px; color: var(--live-text); background: var(--live-input-bg); outline: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .live-search-wrap input::placeholder { color: var(--live-text-muted); }
+  .live-search-wrap input:focus { border-color: #00D4E8; }
+  .live-search-clear {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: none; background: none; cursor: pointer;
+    color: var(--live-text-muted); font-size: 15px; line-height: 1; padding: 4px 6px; font-family: inherit;
+  }
+  .live-search-clear:hover { color: var(--live-text); }
+
   .live-gate-wrap { max-width: 380px; margin: 60px auto; text-align: center; }
   .live-gate-icon {
     width: 52px; height: 52px; margin: 0 auto 20px; border-radius: 100px; background: rgba(0,212,232,0.1);
@@ -711,7 +729,8 @@ var state = {
   liveAuthed: false, livePassword: "", liveRows: [], liveLoading: false, liveLoadError: false,
   livePwError: "", liveChecking: false,
   liveTheme: (function () { try { return localStorage.getItem("xc_live_theme") === "light" ? "light" : "dark"; } catch (e) { return "dark"; } })(),
-  liveExpandedKode: null
+  liveExpandedKode: null,
+  liveSearch: ""
 };
 
 try {
@@ -961,6 +980,16 @@ function toggleLiveDetail(kode) {
   renderLive();
 }
 
+function liveSetSearch(v) {
+  state.liveSearch = v;
+  renderLive();
+}
+
+function liveClearSearch() {
+  state.liveSearch = "";
+  renderLive();
+}
+
 function renderLiveDetailRow(c) {
   var s = c.stats;
   var r = c.row;
@@ -1038,6 +1067,9 @@ function countUp(el, target, duration) {
 function renderLive() {
   var el = document.getElementById("view-live");
   var rows = state.liveRows || [];
+  var liveSearchEl = document.getElementById("live-search");
+  var liveSearchFocused = liveSearchEl && document.activeElement === liveSearchEl;
+  var liveSearchSel = liveSearchFocused ? [liveSearchEl.selectionStart, liveSearchEl.selectionEnd] : null;
 
   if (state.liveLoading && !rows.length) {
     el.innerHTML = '<div class="' + liveWrapClass() + '"><div class="live-inner"><div class="empty-note" style="color:var(--live-text-muted);">Memuat live intelligence…</div></div></div>';
@@ -1165,13 +1197,30 @@ function renderLive() {
   html += '</div>';
   html += '</div>';
 
+  var liveSearchQuery = (state.liveSearch || "").trim().toLowerCase();
+  var liveSearching = !!liveSearchQuery;
+  var liveFilteredCompany = !liveSearching ? perCompany : perCompany.filter(function (c) {
+    var r = c.row, s = c.stats;
+    var riskSevKey = topSeverity(s);
+    var hay = [r.kode, r.perusahaan, r.domain, r.email, LIVE_STATUS_LABELS[s.status], riskSevKey ? SEV_LABELS[riskSevKey] : ""].join(" ").toLowerCase();
+    return hay.indexOf(liveSearchQuery) >= 0;
+  });
+
   html += '<div class="live-panel" style="animation-delay:.5s;">';
-  html += '<div class="live-panel-pad" style="padding-bottom:10px;"><div class="live-panel-title">Engagement Aktif</div><div class="live-panel-sub" style="margin-bottom:0;">Berdasarkan kode registrasi Cybersecurity Clinic</div></div>';
+  html += '<div class="live-panel-pad" style="padding-bottom:10px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;">';
+  html += '<div><div class="live-panel-title">Engagement Aktif</div><div class="live-panel-sub" style="margin-bottom:0;">' + (liveSearching ? liveFilteredCompany.length + ' hasil untuk &ldquo;' + esc(state.liveSearch.trim()) + '&rdquo;' : 'Berdasarkan kode registrasi Cybersecurity Clinic') + '</div></div>';
+  html += '<div class="live-search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.35-4.35"/></svg>' +
+    '<input id="live-search" placeholder="Cari kode, perusahaan, domain…" value="' + esc(state.liveSearch) + '" oninput="liveSetSearch(this.value)">' +
+    (state.liveSearch ? '<button class="live-search-clear" onclick="liveClearSearch()" aria-label="Hapus pencarian">&times;</button>' : '') +
+    '</div>';
+  html += '</div>';
   if (!perCompany.length) {
     html += '<div class="empty-note" style="color:var(--live-text-muted);padding:0 24px 24px;">Belum ada engagement aktif.</div>';
+  } else if (!liveFilteredCompany.length) {
+    html += '<div class="empty-note" style="color:var(--live-text-muted);padding:0 24px 24px;">Tidak ada engagement yang cocok dengan pencarian.</div>';
   } else {
     html += '<div class="live-table-scroll"><table class="live-table"><thead><tr><th>Kode</th><th>Status</th><th>Findings</th><th>Risk</th><th>Kredensial Bocor</th><th>Estimasi Kerugian</th></tr></thead><tbody>';
-    perCompany.slice().sort(function (a, b) {
+    liveFilteredCompany.slice().sort(function (a, b) {
       var sevA = SEV_ORDER.indexOf(topSeverity(a.stats)); if (sevA < 0) sevA = 99;
       var sevB = SEV_ORDER.indexOf(topSeverity(b.stats)); if (sevB < 0) sevB = 99;
       return LIVE_STATUS_ORDER[a.stats.status] - LIVE_STATUS_ORDER[b.stats.status] || sevA - sevB || b.stats.risk - a.stats.risk;
@@ -1216,6 +1265,11 @@ function renderLive() {
   countUp(document.getElementById("cu-risk"), avgRisk, 900);
   countUp(document.getElementById("cu-dw"), totalDarkweb, 900);
   countUp(document.getElementById("cu-dw-affected"), affectedDarkweb, 900);
+
+  if (liveSearchFocused) {
+    var nls = document.getElementById("live-search");
+    if (nls) { nls.focus(); nls.setSelectionRange(liveSearchSel[0], liveSearchSel[1]); }
+  }
 }
 
 function set(key) {
