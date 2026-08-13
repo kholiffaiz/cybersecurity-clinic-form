@@ -673,11 +673,12 @@ function statIcon(name, color) {
   return '<div class="live-stat-icon"' + (color ? ' style="color:' + color + ';"' : '') + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg></div>';
 }
 var LIVE_TOP_VULNS = [
-  { severity: "critical", score: 10.0, title: "Default admin credentials (admin/admin123) accept…", domain: "ptmatsuo.co.id" },
-  { severity: "critical", score: 10.0, title: "Default admin credentials (admin/admin123) accept…", domain: "ptmatsuo.co.id" },
-  { severity: "critical", score: 9.3, title: "Default admin credentials (admin/admin123) accepte…", domain: "ptmatsuo.co.id" },
-  { severity: "critical", score: 9.1, title: "DNS zone not signed with DNSSEC (DNS spoofin…", domain: "fln.co.id" },
-  { severity: "high", score: 8.8, title: "Unthrottled xmlrpc.php authentication endpoint enables cr…", domain: "fln.co.id" }
+  { severity: "critical", score: 9.3, title: "Default admin credentials (admin/admin123) accepted by R4DIX ERP and displayed on the public login page", domain: "ptmatsuo.co.id" },
+  { severity: "critical", score: 9.1, title: "DNS zone not signed with DNSSEC (DNS spoofing / cache-poisoning exposure)", domain: "fln.co.id" },
+  { severity: "high", score: 8.8, title: "Missing rate limiting and account lockout on 2WINS Chat login enables credential spraying", domain: "astemo.com" },
+  { severity: "high", score: 8.8, title: "Unthrottled xmlrpc.php authentication endpoint enables credential brute-force amplification", domain: "fln.co.id" },
+  { severity: "high", score: 8.7, title: "Employee PII (256 records: names, PINs, fingerprint-device passwords) exposed in public Gitea repository", domain: "fln.co.id" },
+  { severity: "high", score: 8.7, title: "WordPress username enumeration via publicly indexed Yoast SEO author sitemap", domain: "maxxis.id" }
 ];
 var LIVE_STATUSES = ["scheduled", "scanning", "analyzing", "ready"];
 var LIVE_STATUS_LABELS = { scheduled: "Scheduled", scanning: "Scanning", analyzing: "Analyzing", ready: "Report Ready" };
@@ -716,6 +717,33 @@ var LIVE_REAL_FINDINGS = {
   "GMU-307380238": { critical: 6, high: 0, medium: 7, low: 1, lostEstimation: 67000 },
   "GMU-510086082": { critical: 0, high: 0, medium: 0, low: 0, lostEstimation: 0 },
   "GMU-831176858": { critical: 0, high: 0, medium: 0, low: 0, lostEstimation: 0 }
+};
+
+var LIVE_PENTEST_RESULTS = {
+  "GMU-740783259": { critical: 0, high: 0, medium: 3, low: 1 },
+  "GMU-065191521": { critical: 0, high: 0, medium: 5, low: 2 },
+  "GMU-254076696": { critical: 0, high: 1, medium: 4, low: 3 },
+  "GMU-666868394": { critical: 1, high: 4, medium: 3, low: 1 },
+  "GMU-340799032": { critical: 0, high: 0, medium: 3, low: 1 },
+  "GMU-127648546": { critical: 0, high: 0, medium: 19, low: 6 },
+  "GMU-040413690": { critical: 0, high: 0, medium: 3, low: 2 },
+  "GMU-110410899": { critical: 0, high: 0, medium: 2, low: 2 },
+  "GMU-227683284": { critical: 0, high: 0, medium: 4, low: 1 },
+  "GMU-522309115": { critical: 0, high: 0, medium: 4, low: 1 },
+  "GMU-134732623": { critical: 0, high: 2, medium: 3, low: 3 },
+  "GMU-318221208": { critical: 0, high: 0, medium: 2, low: 3 },
+  "GMU-530190": { critical: 0, high: 0, medium: 5, low: 1 },
+  "GMU-730647943": { critical: 0, high: 0, medium: 7, low: 6 },
+  "GMU-560630193": { critical: 0, high: 0, medium: 1, low: 2 },
+  "GMU-264785": { critical: 0, high: 0, medium: 2, low: 1 },
+  "GMU-455271634": { critical: 0, high: 0, medium: 3, low: 1 },
+  "GMU-510086082": { critical: 0, high: 0, medium: 4, low: 0 },
+  "GMU-831176858": { critical: 0, high: 0, medium: 4, low: 0 },
+  "GMU-076076729": { critical: 1, high: 0, medium: 5, low: 2 },
+  "GMU-307380238": { critical: 0, high: 0, medium: 4, low: 1 },
+  "GMU-497480574": { critical: 0, high: 2, medium: 2, low: 2 },
+  "GMU-916493064": { critical: 0, high: 0, medium: 3, low: 1 },
+  "GMU-458166": { critical: 0, high: 1, medium: 1, low: 1 }
 };
 
 var state = {
@@ -993,9 +1021,11 @@ function liveClearSearch() {
 function renderLiveDetailRow(c) {
   var s = c.stats;
   var r = c.row;
-  var riskSev = topSeverity(s);
-  var riskLabel = riskSev ? SEV_LABELS[riskSev] : "Tidak ada temuan";
-  var riskColor = riskSev ? SEV_COLORS[riskSev] : "#4ADE80";
+  var dw = s.darkweb || { critical: 0, high: 0, medium: 0, low: 0 };
+  var pt = s.pentest;
+  var dwSev = topSeverity(dw);
+  var dwLabel = dwSev ? SEV_LABELS[dwSev] : "Tidak ada temuan";
+  var dwColor = dwSev ? SEV_COLORS[dwSev] : "#4ADE80";
   var html = '<tr class="live-detail-tr"><td class="live-detail-td" colspan="6">';
   html += '<div class="live-detail-outer">';
   html += '<div class="live-detail-header"><span class="live-detail-company-name">' + esc(r.perusahaan || "&mdash;") + '</span><span class="live-detail-company-domain">' + esc(r.domain || "&mdash;") + '</span></div>';
@@ -1004,12 +1034,12 @@ function renderLiveDetailRow(c) {
   html += '<div class="live-detail-col">';
   html += '<div class="live-detail-title" style="color:#F03C3C;">Ringkasan Dark Web Monitoring</div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Total kredensial bocor</span><span class="live-detail-value" style="color:#F03C3C;">' + (s.darkwebCreds || 0) + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Critical</span><span class="live-detail-value" style="color:' + SEV_COLORS.critical + ';">' + s.critical + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value" style="color:' + SEV_COLORS.high + ';">' + s.high + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value" style="color:' + SEV_COLORS.medium + ';">' + s.medium + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value" style="color:' + SEV_COLORS.low + ';">' + s.low + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Critical</span><span class="live-detail-value" style="color:' + SEV_COLORS.critical + ';">' + dw.critical + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value" style="color:' + SEV_COLORS.high + ';">' + dw.high + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value" style="color:' + SEV_COLORS.medium + ';">' + dw.medium + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value" style="color:' + SEV_COLORS.low + ';">' + dw.low + '</span></div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Status pemantauan</span><span class="live-detail-value">' + (s.darkwebCreds > 0 ? "Kredensial ditemukan" : "Tidak ada temuan") + '</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Tingkat risiko tertinggi</span><span class="live-detail-value" style="color:' + riskColor + ';">' + riskLabel + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Tingkat risiko tertinggi</span><span class="live-detail-value" style="color:' + dwColor + ';">' + dwLabel + '</span></div>';
   html += '<div class="live-detail-row-item"><span class="live-detail-label">Estimasi kerugian</span><span class="live-detail-value" style="color:#F03C3C;">' + (s.lostEstimation != null ? "$" + s.lostEstimation.toLocaleString("en-US") + "+" : "&mdash;") + '</span></div>';
   html += '<div class="live-detail-note">' + (s.darkwebCreds > 0
     ? 'Ditemukan ' + s.darkwebCreds + ' kredensial (email/password) terkait domain ini yang bocor di forum &amp; marketplace dark web. Disarankan segera reset kredensial dan aktifkan MFA pada akun terkait.'
@@ -1018,11 +1048,25 @@ function renderLiveDetailRow(c) {
 
   html += '<div class="live-detail-col">';
   html += '<div class="live-detail-title" style="color:#00D4E8;">Ringkasan Hasil Pentest</div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Critical</span><span class="live-detail-value">&mdash;</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value">&mdash;</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value">&mdash;</span></div>';
-  html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value">&mdash;</span></div>';
-  html += '<div class="live-detail-note">Hasil pentest belum tersedia untuk engagement ini &mdash; data akan diperbarui setelah pengujian selesai.</div>';
+  if (pt) {
+    var ptTotal = pt.critical + pt.high + pt.medium + pt.low;
+    var ptSev = topSeverity(pt);
+    var ptLabel = ptSev ? SEV_LABELS[ptSev] : "Tidak ada temuan";
+    var ptColor = ptSev ? SEV_COLORS[ptSev] : "#4ADE80";
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">Total temuan pentest</span><span class="live-detail-value" style="color:#00D4E8;">' + ptTotal + '</span></div>';
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">Critical</span><span class="live-detail-value" style="color:' + SEV_COLORS.critical + ';">' + pt.critical + '</span></div>';
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value" style="color:' + SEV_COLORS.high + ';">' + pt.high + '</span></div>';
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value" style="color:' + SEV_COLORS.medium + ';">' + pt.medium + '</span></div>';
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value" style="color:' + SEV_COLORS.low + ';">' + pt.low + '</span></div>';
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">Tingkat risiko tertinggi</span><span class="live-detail-value" style="color:' + ptColor + ';">' + ptLabel + '</span></div>';
+    html += '<div class="live-detail-note">Ditemukan ' + ptTotal + ' temuan dari hasil AI red-team penetration test (ORYX) pada domain ini. Rincian lengkap tersedia pada laporan pentest resmi.</div>';
+  } else {
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">Critical</span><span class="live-detail-value">&mdash;</span></div>';
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value">&mdash;</span></div>';
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value">&mdash;</span></div>';
+    html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value">&mdash;</span></div>';
+    html += '<div class="live-detail-note">Hasil pentest belum tersedia untuk engagement ini &mdash; data akan diperbarui setelah pengujian selesai.</div>';
+  }
   html += '</div>';
 
   html += '</div></div></td></tr>';
@@ -1080,14 +1124,28 @@ function renderLive() {
     var stats = liveStatsForKode(r.kode || r.perusahaan);
     var realStatus = normalizeSheetStatus(r.status);
     if (realStatus) stats.status = realStatus;
+
     var real = LIVE_REAL_FINDINGS[r.kode];
+    var darkweb = real
+      ? { critical: real.critical, high: real.high, medium: real.medium, low: real.low }
+      : { critical: stats.critical, high: stats.high, medium: stats.medium, low: stats.low };
     if (real) {
-      stats.critical = real.critical; stats.high = real.high; stats.medium = real.medium; stats.low = real.low;
-      stats.total = real.critical + real.high + real.medium + real.low;
-      stats.darkwebCreds = stats.total;
+      stats.darkwebCreds = real.critical + real.high + real.medium + real.low;
       stats.lostEstimation = real.lostEstimation;
-      stats.risk = Math.min(100, Math.round(real.critical * 18 + real.high * 9 + real.medium * 3 + real.low * 1));
     }
+
+    var pt = LIVE_PENTEST_RESULTS[r.kode];
+    var pentest = pt ? { critical: pt.critical, high: pt.high, medium: pt.medium, low: pt.low } : null;
+
+    stats.critical = darkweb.critical + (pentest ? pentest.critical : 0);
+    stats.high = darkweb.high + (pentest ? pentest.high : 0);
+    stats.medium = darkweb.medium + (pentest ? pentest.medium : 0);
+    stats.low = darkweb.low + (pentest ? pentest.low : 0);
+    stats.total = stats.critical + stats.high + stats.medium + stats.low;
+    stats.risk = Math.min(100, Math.round(stats.critical * 18 + stats.high * 9 + stats.medium * 3 + stats.low * 1));
+    stats.darkweb = darkweb;
+    stats.pentest = pentest;
+
     return { row: r, stats: stats };
   });
 
