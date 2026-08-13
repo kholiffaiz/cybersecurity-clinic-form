@@ -523,6 +523,24 @@
   .live-detail-value { font-weight: 700; }
   .live-detail-note { font-size: 11.5px; color: var(--live-text-muted); line-height: 1.65; margin-top: 12px; }
 
+  .live-detail-section { background: var(--live-panel-bg); border: 1px solid var(--live-panel-border); border-radius: 10px; padding: 16px 18px; margin-top: 14px; }
+  .live-detail-section p { margin: 0; font-size: 12px; line-height: 1.75; color: var(--live-text); }
+  .live-detail-section ul { margin: 10px 0 0; padding-left: 18px; font-size: 12px; line-height: 1.8; color: var(--live-text); }
+  .live-detail-section ul li { margin-bottom: 4px; }
+  .live-pitch-box {
+    margin-top: 14px; border-radius: 12px; padding: 20px 22px;
+    background: linear-gradient(135deg, rgba(27,82,206,.14), rgba(0,212,232,.1));
+    border: 1px solid rgba(0,212,232,.4);
+  }
+  .live-pitch-box .live-detail-title { color: #00D4E8; }
+  .live-pitch-box p { margin: 0 0 14px; font-size: 12.5px; line-height: 1.75; color: var(--live-text); }
+  .live-pitch-btn {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--xc-gradient);
+    color: #fff; font-weight: 700; font-size: 12.5px; padding: 10px 20px; border-radius: 8px;
+    text-decoration: none; transition: opacity .15s ease;
+  }
+  .live-pitch-btn:hover { opacity: .88; color: #fff; }
+
   .live-search-wrap { position: relative; width: 100%; max-width: 260px; }
   .live-search-wrap svg {
     position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px;
@@ -1025,6 +1043,88 @@ function liveClearSearch() {
   renderLive();
 }
 
+var LIVE_RISK_COPY = {
+  critical: {
+    tone: "TINGGI",
+    impact: function (s) {
+      return 'Dengan ' + s.critical + ' temuan critical dari total ' + s.total + ' kerentanan yang belum diremediasi, organisasi ini berada pada tingkat risiko <strong>TINGGI</strong> terhadap gangguan operasional, pencurian data pelanggan/karyawan, hingga potensi serangan ransomware yang dapat melumpuhkan proses bisnis inti.' +
+        (s.darkwebCreds > 0 ? ' Ditambah lagi, ' + s.darkwebCreds + ' kredensial yang telah bocor di dark web memperbesar peluang akses tidak sah ke sistem internal.' : '') +
+        ' Insiden serupa secara historis menimbulkan kerugian finansial langsung' + (s.lostEstimation ? ' (estimasi awal mencapai $' + s.lostEstimation.toLocaleString("en-US") + '+)' : '') + ', biaya pemulihan pasca-insiden, serta erosi kepercayaan pelanggan dan mitra bisnis yang sulit dipulihkan.';
+    },
+    mentionPidana: true
+  },
+  high: {
+    tone: "TINGGI",
+    impact: function (s) {
+      return 'Dengan ' + s.high + ' temuan high dan total ' + s.total + ' kerentanan yang belum diremediasi, organisasi ini menghadapi risiko signifikan berupa gangguan layanan, penyalahgunaan akun, dan eksfiltrasi data.' +
+        (s.darkwebCreds > 0 ? ' ' + s.darkwebCreds + ' kredensial terkait domain ini juga terpantau bocor di dark web, memperbesar peluang serangan lanjutan (credential stuffing/akses tidak sah).' : '') +
+        ' Tanpa remediasi, eksposur ini berpotensi meningkat menjadi insiden berskala lebih besar dengan dampak finansial dan reputasional yang jauh lebih tinggi.';
+    },
+    mentionPidana: true
+  },
+  medium: {
+    tone: "SEDANG",
+    impact: function (s) {
+      return 'Ditemukan ' + s.total + ' kerentanan (didominasi tingkat medium) yang, meski belum berisiko kritis, tetap membuka celah bagi pihak tidak bertanggung jawab untuk melakukan pengintaian lebih lanjut, social engineering, atau eskalasi menuju akses yang lebih dalam.' +
+        (s.darkwebCreds > 0 ? ' Ditambah ' + s.darkwebCreds + ' kredensial yang sudah beredar di dark web, jendela risiko organisasi tetap terbuka.' : '') +
+        ' Membiarkan temuan ini tanpa remediasi meningkatkan peluang kerentanan tereskalasi menjadi insiden yang lebih serius di masa depan.';
+    },
+    mentionPidana: false
+  },
+  low: {
+    tone: "RENDAH",
+    impact: function (s) {
+      return 'Profil temuan saat ini tergolong risiko rendah (' + s.total + ' temuan, mayoritas low-severity), namun postur keamanan tetap perlu dijaga secara berkelanjutan.' +
+        (s.darkwebCreds > 0 ? ' Terpantau ' + s.darkwebCreds + ' kredensial terkait domain ini di dark web yang sebaiknya segera direset sebagai langkah pencegahan.' : '') +
+        ' Kerentanan low-severity kerap diabaikan padahal dapat dirangkai (chained) oleh penyerang berpengalaman menjadi jalur akses yang lebih signifikan.';
+    },
+    mentionPidana: false
+  },
+  none: {
+    tone: "MINIMAL",
+    impact: function (s) {
+      return 'Belum ada temuan signifikan pada pemindaian/pentest terakhir untuk domain ini &mdash; postur keamanan saat ini relatif baik. Namun, lanskap ancaman terus berubah setiap hari, dan validasi keamanan bersifat snapshot pada satu titik waktu &mdash; bukan jaminan permanen.';
+    },
+    mentionPidana: false
+  }
+};
+
+function renderLiveRiskLegalPitch(s) {
+  var sev = topSeverity(s) || "none";
+  var copy = LIVE_RISK_COPY[sev];
+  var html = '';
+
+  html += '<div class="live-detail-section">';
+  html += '<div class="live-detail-title" style="color:#F5B93B;">Business Risk &amp; Impact</div>';
+  html += '<p>' + copy.impact(s) + '</p>';
+  html += '</div>';
+
+  html += '<div class="live-detail-section">';
+  html += '<div class="live-detail-title" style="color:#F5B93B;">Pelanggaran Peraturan &amp; Potensi Sanksi</div>';
+  html += '<p>Berdasarkan profil temuan di atas, organisasi ini <strong>berpotensi</strong> berada dalam eksposur risiko tingkat <strong>' + copy.tone + '</strong> terhadap ketentuan perlindungan data &amp; keamanan sistem elektronik yang berlaku di Indonesia:</p>';
+  html += '<ul>';
+  html += '<li><strong>UU No. 27/2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> &mdash; Pasal 35 &amp; 39: kewajiban Pengendali Data Pribadi menjaga keamanan data pribadi yang diproses. Kegagalan mencegah kebocoran kredensial/data dapat dikategorikan sebagai pelanggaran kewajiban ini.</li>';
+  html += '<li><strong>UU No. 19/2016 tentang Informasi &amp; Transaksi Elektronik (ITE)</strong> &mdash; kewajiban penyelenggara sistem elektronik menjaga kerahasiaan, keutuhan, dan ketersediaan data yang dikelolanya.</li>';
+  html += '</ul>';
+  html += '<p style="margin-top:12px;"><strong>Potensi sanksi:</strong></p>';
+  html += '<ul>';
+  html += '<li>Sanksi administratif UU PDP (Pasal 57): peringatan tertulis, penghentian sementara pemrosesan data, penghapusan/pemusnahan data pribadi, dan/atau denda administratif hingga 2% dari pendapatan/penerimaan tahunan.</li>';
+  if (copy.mentionPidana) {
+    html += '<li>Sanksi pidana UU PDP (Pasal 67&ndash;70): pidana penjara hingga 6 tahun dan/atau denda hingga Rp6 miliar untuk pelanggaran tertentu terkait data pribadi (mis. memperoleh/mengungkapkan data pribadi secara melawan hukum).</li>';
+  }
+  html += '<li>Risiko kontraktual &amp; reputasional: pemutusan kerja sama oleh klien/mitra yang mensyaratkan kepatuhan keamanan informasi (mis. audit vendor, sertifikasi ISO 27001).</li>';
+  html += '</ul>';
+  html += '</div>';
+
+  html += '<div class="live-pitch-box">';
+  html += '<div class="live-detail-title">Rekomendasi Xecura</div>';
+  html += '<p>Ringkasan ini baru permukaan dari risiko yang sebenarnya. Dapatkan <strong>Laporan Pentest AI lengkap</strong> (detail teknis, bukti eksploitasi, CVSS scoring per temuan) beserta <strong>sesi konsultasi remediasi</strong> bersama tim Xecura untuk menutup celah keamanan ini sebelum dieksploitasi &mdash; dan sebelum berujung pada sanksi regulasi atau kehilangan kepercayaan pelanggan.</p>';
+  html += '<a class="live-pitch-btn" href="/" target="_blank" rel="noopener">Jadwalkan Pentest AI &amp; Konsultasi &rarr;</a>';
+  html += '</div>';
+
+  return html;
+}
+
 function renderLiveDetailRow(c) {
   var s = c.stats;
   var r = c.row;
@@ -1076,7 +1176,9 @@ function renderLiveDetailRow(c) {
   }
   html += '</div>';
 
-  html += '</div></div></td></tr>';
+  html += '</div>';
+  html += renderLiveRiskLegalPitch(s);
+  html += '</div></td></tr>';
   return html;
 }
 
