@@ -482,6 +482,32 @@
   .live-mini-bar { display: flex; height: 6px; width: 90px; border-radius: 100px; overflow: hidden; background: var(--live-track-bg); }
   .live-mini-seg { height: 100%; }
 
+  table.live-table tbody tr.live-row-clickable { cursor: pointer; transition: background .15s ease; }
+  table.live-table tbody tr.live-row-clickable:hover { background: var(--live-panel-hover-bg); }
+  table.live-table tbody tr.live-row-expanded { background: var(--live-panel-hover-bg); }
+  .live-row-chevron {
+    display: inline-block; margin-left: 7px; color: var(--live-text-muted); font-size: 9px;
+    transition: transform .2s ease;
+  }
+  tr.live-row-expanded .live-row-chevron { transform: rotate(90deg); color: #00D4E8; }
+
+  .live-detail-td { padding: 0 !important; border-bottom: 1px solid var(--live-row-border); }
+  .live-detail-wrap {
+    padding: 18px 24px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    animation: fadeInUp .3s ease both;
+  }
+  @media (max-width: 700px) { .live-detail-wrap { grid-template-columns: 1fr; } }
+  .live-detail-col { background: var(--live-panel-bg); border: 1px solid var(--live-panel-border); border-radius: 10px; padding: 16px 18px; }
+  .live-detail-title { font-size: 10.5px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 12px; }
+  .live-detail-row-item {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 7px 0; font-size: 12.5px; color: var(--live-text); border-bottom: 1px solid var(--live-row-border);
+  }
+  .live-detail-row-item:last-child { border-bottom: none; }
+  .live-detail-label { color: var(--live-text-muted); }
+  .live-detail-value { font-weight: 700; }
+  .live-detail-note { font-size: 11.5px; color: var(--live-text-muted); line-height: 1.65; margin-top: 12px; }
+
   .live-gate-wrap { max-width: 380px; margin: 60px auto; text-align: center; }
   .live-gate-icon {
     width: 52px; height: 52px; margin: 0 auto 20px; border-radius: 100px; background: rgba(0,212,232,0.1);
@@ -668,7 +694,8 @@ var state = {
   dashSearch: "", dashSortKey: "ts", dashSortDir: "desc",
   liveAuthed: false, livePassword: "", liveRows: [], liveLoading: false, liveLoadError: false,
   livePwError: "", liveChecking: false,
-  liveTheme: (function () { try { return localStorage.getItem("xc_live_theme") === "light" ? "light" : "dark"; } catch (e) { return "dark"; } })()
+  liveTheme: (function () { try { return localStorage.getItem("xc_live_theme") === "light" ? "light" : "dark"; } catch (e) { return "dark"; } })(),
+  liveExpandedKode: null
 };
 
 try {
@@ -913,6 +940,45 @@ function isLiveActive(status) {
   return status === "scanning" || status === "analyzing";
 }
 
+function toggleLiveDetail(kode) {
+  state.liveExpandedKode = state.liveExpandedKode === kode ? null : kode;
+  renderLive();
+}
+
+function renderLiveDetailRow(c) {
+  var s = c.stats;
+  var r = c.row;
+  var riskSev = topSeverity(s);
+  var riskLabel = riskSev ? SEV_LABELS[riskSev] : "Tidak ada temuan";
+  var riskColor = riskSev ? SEV_COLORS[riskSev] : "#4ADE80";
+  var html = '<tr class="live-detail-tr"><td class="live-detail-td" colspan="6">';
+  html += '<div class="live-detail-wrap">';
+
+  html += '<div class="live-detail-col">';
+  html += '<div class="live-detail-title" style="color:#F03C3C;">Ringkasan Dark Web Monitoring</div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Kredensial bocor ditemukan</span><span class="live-detail-value" style="color:#F03C3C;">' + (s.darkwebCreds || 0) + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Domain dipantau</span><span class="live-detail-value">' + esc(r.domain || "&mdash;") + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Status pemantauan</span><span class="live-detail-value">' + (s.darkwebCreds > 0 ? "Kredensial ditemukan" : "Tidak ada temuan") + '</span></div>';
+  html += '<div class="live-detail-note">' + (s.darkwebCreds > 0
+    ? 'Ditemukan ' + s.darkwebCreds + ' kredensial (email/password) terkait domain ini yang bocor di forum &amp; marketplace dark web. Disarankan segera reset kredensial dan aktifkan MFA pada akun terkait.'
+    : 'Belum ditemukan kebocoran kredensial terkait domain ini pada pemindaian terakhir.') + '</div>';
+  html += '</div>';
+
+  html += '<div class="live-detail-col">';
+  html += '<div class="live-detail-title" style="color:#00D4E8;">Ringkasan Hasil Pentest</div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Total temuan</span><span class="live-detail-value">' + s.total + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Critical</span><span class="live-detail-value" style="color:' + SEV_COLORS.critical + ';">' + s.critical + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">High</span><span class="live-detail-value" style="color:' + SEV_COLORS.high + ';">' + s.high + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Medium</span><span class="live-detail-value" style="color:' + SEV_COLORS.medium + ';">' + s.medium + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Low</span><span class="live-detail-value" style="color:' + SEV_COLORS.low + ';">' + s.low + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Tingkat risiko tertinggi</span><span class="live-detail-value" style="color:' + riskColor + ';">' + riskLabel + '</span></div>';
+  html += '<div class="live-detail-row-item"><span class="live-detail-label">Estimasi kerugian</span><span class="live-detail-value" style="color:#F03C3C;">' + (s.lostEstimation != null ? "$" + s.lostEstimation.toLocaleString("en-US") + "+" : "&mdash;") + '</span></div>';
+  html += '</div>';
+
+  html += '</div></td></tr>';
+  return html;
+}
+
 function liveWrapClass() {
   return "live-wrap" + (state.liveTheme === "light" ? " live-light" : "");
 }
@@ -1095,8 +1161,10 @@ function renderLive() {
       var riskColor = riskSev ? SEV_COLORS[riskSev] : "#4ADE80";
       var riskLabel = riskSev ? SEV_LABELS[riskSev] : "&mdash;";
       var dwColor = s.darkwebCreds >= 50 ? SEV_COLORS.critical : s.darkwebCreds >= 10 ? SEV_COLORS.high : s.darkwebCreds > 0 ? "#F5B93B" : "#6E7C99";
-      html += '<tr>';
-      html += '<td class="ltcode">' + esc(c.row.kode || "&mdash;") + '</td>';
+      var kode = c.row.kode || "";
+      var isExpanded = kode && state.liveExpandedKode === kode;
+      html += '<tr class="live-row-clickable' + (isExpanded ? ' live-row-expanded' : '') + '" onclick="toggleLiveDetail(\'' + kode + '\')">';
+      html += '<td class="ltcode">' + esc(kode || "&mdash;") + (kode ? '<span class="live-row-chevron">&#9656;</span>' : '') + '</td>';
       html += '<td><span class="live-status-pill live-status-' + s.status + '">' + LIVE_STATUS_LABELS[s.status] + '</span>' + (isLiveActive(s.status) ? '<span class="ai-spin"></span>' : '') + '</td>';
       html += '<td><div class="live-mini-bar">';
       ["critical", "high", "medium", "low"].forEach(function (k) {
@@ -1108,6 +1176,7 @@ function renderLive() {
       html += '<td style="color:' + dwColor + ';font-weight:600;">' + (s.darkwebCreds > 0 ? s.darkwebCreds : "&mdash;") + '</td>';
       html += '<td style="color:#F03C3C;font-weight:600;">' + (s.lostEstimation != null ? "$" + s.lostEstimation.toLocaleString("en-US") + "+" : "&mdash;") + '</td>';
       html += '</tr>';
+      if (isExpanded) html += renderLiveDetailRow(c);
     });
     html += '</tbody></table></div>';
   }
