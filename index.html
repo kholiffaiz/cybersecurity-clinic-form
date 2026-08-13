@@ -853,18 +853,7 @@ function dashLogout() {
   renderDashGate();
 }
 
-function submitDashPw() {
-  var input = document.getElementById("gate-pw");
-  var pw = (input ? input.value : "").trim();
-  if (!pw) {
-    state.dashPwError = "Masukkan password terlebih dahulu.";
-    renderDashGate();
-    return;
-  }
-  state.dashChecking = true;
-  state.dashPwError = "";
-  renderDashGate();
-
+function attemptDashLogin(pw, retriesLeft) {
   fetch(API_URL + "?pw=" + encodeURIComponent(pw), { method: "GET", credentials: "omit" })
     .then(function (r) { return r.json(); })
     .then(function (data) {
@@ -884,10 +873,28 @@ function submitDashPw() {
       }
     })
     .catch(function () {
+      if (retriesLeft > 0) {
+        setTimeout(function () { attemptDashLogin(pw, retriesLeft - 1); }, 1200);
+        return;
+      }
       state.dashChecking = false;
       state.dashPwError = "Gagal menghubungi server. Coba lagi.";
       renderDashGate();
     });
+}
+
+function submitDashPw() {
+  var input = document.getElementById("gate-pw");
+  var pw = (input ? input.value : "").trim();
+  if (!pw) {
+    state.dashPwError = "Masukkan password terlebih dahulu.";
+    renderDashGate();
+    return;
+  }
+  state.dashChecking = true;
+  state.dashPwError = "";
+  renderDashGate();
+  attemptDashLogin(pw, 3);
 }
 
 function renderDashGate() {
@@ -914,7 +921,7 @@ function renderDashGate() {
 
 function loadLiveRows(retriesLeft) {
   if (!state.liveAuthed || !state.livePassword) return;
-  if (retriesLeft === undefined) retriesLeft = 2;
+  if (retriesLeft === undefined) retriesLeft = 3;
   state.liveLoading = true;
   fetch(API_URL + "?pw=" + encodeURIComponent(state.livePassword), { method: "GET", credentials: "omit" })
     .then(function (r) {
@@ -954,18 +961,7 @@ function liveLogout() {
   renderLiveGate();
 }
 
-function submitLivePw() {
-  var input = document.getElementById("live-gate-pw");
-  var pw = (input ? input.value : "").trim();
-  if (!pw) {
-    state.livePwError = "Masukkan password terlebih dahulu.";
-    renderLiveGate();
-    return;
-  }
-  state.liveChecking = true;
-  state.livePwError = "";
-  renderLiveGate();
-
+function attemptLiveLogin(pw, retriesLeft) {
   fetch(API_URL + "?pw=" + encodeURIComponent(pw), { method: "GET", credentials: "omit" })
     .then(function (r) { return r.json(); })
     .then(function (data) {
@@ -984,10 +980,28 @@ function submitLivePw() {
       }
     })
     .catch(function () {
+      if (retriesLeft > 0) {
+        setTimeout(function () { attemptLiveLogin(pw, retriesLeft - 1); }, 1200);
+        return;
+      }
       state.liveChecking = false;
       state.livePwError = "Gagal menghubungi server. Coba lagi.";
       renderLiveGate();
     });
+}
+
+function submitLivePw() {
+  var input = document.getElementById("live-gate-pw");
+  var pw = (input ? input.value : "").trim();
+  if (!pw) {
+    state.livePwError = "Masukkan password terlebih dahulu.";
+    renderLiveGate();
+    return;
+  }
+  state.liveChecking = true;
+  state.livePwError = "";
+  renderLiveGate();
+  attemptLiveLogin(pw, 3);
 }
 
 function renderLiveGate() {
@@ -1697,7 +1711,7 @@ function renderForm() {
 
 function loadRows(retriesLeft) {
   if (!state.dashAuthed || !state.dashPassword) return;
-  if (retriesLeft === undefined) retriesLeft = 2;
+  if (retriesLeft === undefined) retriesLeft = 3;
   state.loading = true;
   fetch(API_URL + "?pw=" + encodeURIComponent(state.dashPassword), { method: "GET", credentials: "omit" })
     .then(function (r) {
