@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dokumentasi — Cybersecurity Clinic | Xecura</title>
+<meta name="description" content="Dokumentasi kegiatan Cybersecurity Clinic bersama Xecura selama dua hari di Hotel Le Premiere.">
+<style>
+  @font-face {
+    font-family: 'Google Sans';
+    src: url('../fonts/GoogleSans-VariableFont_GRAD_opsz_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --xc-navy: #0B2D7E;
+    --xc-blue: #1B52CE;
+    --xc-blue-mid: #2563EB;
+    --xc-blue-light: #EBF2FF;
+    --xc-cyan: #00D4E8;
+    --xc-red: #F03C3C;
+    --xc-text: #1E293B;
+    --xc-text-body: #374151;
+    --xc-text-muted: #6B7280;
+    --xc-bg: #F0F4F8;
+    --xc-bg-light: #F8FAFC;
+    --xc-border: #E2E8F0;
+    --xc-gradient: linear-gradient(90deg, var(--xc-blue) 0%, var(--xc-cyan) 55%, var(--xc-red) 100%);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--xc-bg);
+    font-family: 'Google Sans', system-ui, -apple-system, sans-serif;
+    color: var(--xc-text);
+  }
+  a { color: var(--xc-blue); text-decoration: none; }
+  a:hover { color: var(--xc-blue-mid); }
+
+  .header { background: var(--xc-navy); padding: 0 24px; }
+  .header-inner {
+    max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;
+    min-height: 74px; gap: 14px; flex-wrap: wrap; padding: 12px 0;
+  }
+  .brand img { height: 26px; display: block; }
+  .gradient-bar { height: 4px; background: var(--xc-gradient); }
+
+  .tabs { display: flex; gap: 6px; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 100px; }
+  .tab-btn {
+    border: none; border-radius: 100px; padding: 9px 20px; font-size: 12.5px; font-weight: 700;
+    cursor: pointer; transition: all .15s; background: transparent; color: rgba(255,255,255,0.7);
+  }
+  .tab-btn.active { background: #fff; color: var(--xc-navy); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 64px; }
+  @media (max-width: 600px) { .wrap { padding: 32px 16px 48px; } }
+
+  .eyebrow {
+    display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase;
+    color: var(--xc-blue); background: var(--xc-blue-light); padding: 7px 14px; border-radius: 100px;
+  }
+  .h1 {
+    font-size: 34px; font-weight: 800; line-height: 1.2; margin: 18px 0 12px; letter-spacing: -0.6px;
+    text-align: center;
+  }
+  @media (max-width: 600px) { .h1 { font-size: 25px; } }
+  .lead {
+    font-size: 14px; line-height: 1.72; color: var(--xc-text-body); margin: 0 auto 40px;
+    max-width: 560px; text-align: center;
+  }
+  .center { display: flex; flex-direction: column; align-items: center; }
+
+  .gallery { columns: 3 260px; column-gap: 18px; width: 100%; }
+  @media (max-width: 720px) { .gallery { columns: 2 200px; } }
+  @media (max-width: 460px) { .gallery { columns: 1; } }
+  .gallery figure {
+    margin: 0 0 18px; break-inside: avoid; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(11,45,126,0.1); border: 1px solid var(--xc-border); background: #fff;
+  }
+  .gallery img { width: 100%; display: block; }
+  .gallery figcaption { padding: 10px 14px 13px; font-size: 11.5px; color: var(--xc-text-muted); line-height: 1.5; }
+
+  .footer { border-top: 1px solid var(--xc-border); padding: 22px 24px; background: #fff; margin-top: 56px; }
+  .footer-inner {
+    max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;
+    gap: 20px; font-size: 11px; color: var(--xc-text-muted); flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <a class="brand" href="/"><img src="../assets/logo-xecura-horizontal-white.png" alt="Xecura"></a>
+    <div class="tabs">
+      <a class="tab-btn" href="/">Formulir</a>
+      <a class="tab-btn" href="/scanme/">QR Code</a>
+      <a class="tab-btn" href="/#dash">Dashboard</a>
+      <a class="tab-btn" href="/#live">Live</a>
+      <a class="tab-btn active" href="/dokumentasi/">Dokumentasi</a>
+    </div>
+  </div>
+</div>
+<div class="gradient-bar"></div>
+
+<div class="wrap">
+  <div class="center">
+    <span class="eyebrow">Dokumentasi Kegiatan</span>
+    <h1 class="h1">Cybersecurity Clinic bersama Xecura</h1>
+    <p class="lead">Momen dari rangkaian Cybersecurity Clinic selama dua hari di Hotel Le Premiere &mdash; mulai dari sesi konsultasi keamanan siber dengan tiap perusahaan peserta hingga presentasi Xecura Pentest AI &amp; Dark Web Monitoring di hadapan seluruh peserta.</p>
+  </div>
+
+  <div class="gallery">
+    <figure>
+      <img src="../assets/dokumentasi/clinic-06.jpg" alt="Tim Xecura dan OneSmartService berfoto bersama di sela kegiatan Cybersecurity Clinic" loading="lazy">
+      <figcaption>Tim Xecura &amp; OneSmartService di sela kegiatan</figcaption>
+    </figure>
+    <figure>
+      <img src="../assets/dokumentasi/clinic-01.jpg" alt="Presentasi Xecura Pentest AI dan Dark Web Monitoring di hadapan peserta Cybersecurity Clinic" loading="lazy">
+      <figcaption>Presentasi Xecura Pentest AI &amp; Dark Web Monitoring</figcaption>
+    </figure>
+    <figure>
+      <img src="../assets/dokumentasi/clinic-05.jpg" alt="Tim Xecura menyiapkan booth konsultasi Cybersecurity Clinic di lobby hotel" loading="lazy">
+      <figcaption>Persiapan booth konsultasi di lobby hotel</figcaption>
+    </figure>
+    <figure>
+      <img src="../assets/dokumentasi/clinic-02.jpg" alt="Sesi konsultasi keamanan siber bersama perwakilan perusahaan peserta" loading="lazy">
+      <figcaption>Sesi konsultasi keamanan siber bersama peserta</figcaption>
+    </figure>
+    <figure>
+      <img src="../assets/dokumentasi/clinic-04.jpg" alt="Persiapan booth registrasi Cybersecurity Clinic" loading="lazy">
+      <figcaption>Persiapan booth registrasi peserta</figcaption>
+    </figure>
+    <figure>
+      <img src="../assets/dokumentasi/clinic-03.jpg" alt="Tim Xecura memandu peserta melihat hasil pemindaian keamanan" loading="lazy">
+      <figcaption>Tim Xecura memandu peserta meninjau hasil pemindaian</figcaption>
+    </figure>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-inner">
+    <div>OneSmartService</div>
+    <div>Deltamas Cybersecurity Awareness 2026</div>
+  </div>
+</div>
+
+</body>
+</html>
