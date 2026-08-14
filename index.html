@@ -78,6 +78,13 @@
     cursor: pointer; transition: all .15s; background: transparent; color: rgba(255,255,255,0.7);
   }
   .tab-btn.active { background: #fff; color: var(--xc-navy); }
+  .tab-short { display: none; }
+  @media (max-width: 600px) {
+    .tabs { gap: 2px; padding: 4px; }
+    .tab-btn { padding: 9px 12px; }
+    .tab-full { display: none; }
+    .tab-short { display: inline; }
+  }
   .gradient-bar { height: 4px; background: var(--xc-gradient); }
 
   .page { max-width: 1180px; margin: 0 auto; padding: 44px 24px 64px; }
@@ -604,11 +611,11 @@
       <img src="assets/logo-xecura-horizontal-white.png" alt="Xecura">
     </div>
     <div class="tabs">
-      <button class="tab-btn" id="tab-form" onclick="showView('form')">Formulir</button>
-      <a class="tab-btn" href="/scanme/">QR Code</a>
-      <button class="tab-btn" id="tab-dash" onclick="showView('dash')">Dashboard</button>
+      <button class="tab-btn" id="tab-form" onclick="showView('form')"><span class="tab-full">Formulir</span><span class="tab-short">Form</span></button>
+      <a class="tab-btn" href="/scanme/"><span class="tab-full">QR Code</span><span class="tab-short">QR</span></a>
+      <button class="tab-btn" id="tab-dash" onclick="showView('dash')"><span class="tab-full">Dashboard</span><span class="tab-short">Dash</span></button>
       <button class="tab-btn" id="tab-live" onclick="showView('live')">Live</button>
-      <a class="tab-btn" href="/dokumentasi/">Dokumentasi</a>
+      <a class="tab-btn" href="/dokumentasi/"><span class="tab-full">Dokumentasi</span><span class="tab-short">Doc</span></a>
     </div>
   </div>
 </div>
